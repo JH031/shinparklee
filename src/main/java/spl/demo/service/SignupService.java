@@ -1,5 +1,6 @@
 package spl.demo.service;
 
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import spl.demo.dto.SignupDto;
 import spl.demo.entity.SignupEntity;
@@ -11,15 +12,16 @@ public class SignupService {
 
     private final SignupRepository signupRepository;
 
-    private final BCryptPasswordEncoder passwordEncoder;
+    private final PasswordEncoder passwordEncoder;
 
-    public SignupService(SignupRepository signupRepository) {
+    public SignupService(SignupRepository signupRepository,
+                         PasswordEncoder passwordEncoder) {
         this.signupRepository = signupRepository;
-        this.passwordEncoder = new BCryptPasswordEncoder(); // 비밀번호 암호화 (꼭 필요한지는 모르겠음)
+        this.passwordEncoder = passwordEncoder;
     }
 
     public void signup(SignupDto dto) {
-        if (signupRepository.existsByUsername(dto.getUsername())) {
+        if (signupRepository.existsByUsername(dto.getUserId())) {
             throw new IllegalArgumentException("이미 존재하는 아이디입니다.");
         }
 
