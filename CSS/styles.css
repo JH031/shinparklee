@@ -1,0 +1,136 @@
+
+body {
+  font-family: Arial, sans-serif;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 100vh;
+  margin: 0;
+}
+.container {
+  width: 300px;
+}
+h1, h2 {
+  text-align: center;
+}
+input[type="text"], input[type="password"], input[type="email"], select {
+  width: 100%;
+  padding: 10px;
+  margin-bottom: 15px;
+  box-sizing: border-box;
+  border: 1px solid #9A9A9A;
+  border-radius: 5px;
+}
+button {
+  padding: 10px;
+  background-color: black;
+  color: white;
+  border: none;
+  cursor: pointer;
+}
+a {
+  display: block;
+  font-size: small;
+  text-align: right;
+  margin-top: 10px;
+  color: #9A9A9A;
+  text-decoration: none;
+}
+.signup-layout {
+  display: flex;
+  align-items: flex-start;
+  gap: 40px;
+}
+.news-logo {
+  width: 470px;
+  height: 470px;
+    transform: translateY(20%) translateX(-20%);
+    margin-left: 20px;
+  object-fit: contain;
+}
+label {
+  display: block;
+  margin-bottom: 5px;
+  font-size: 13px;
+
+}
+.id-wrapper {
+  position: relative;
+  width: 100%;
+  margin-bottom: 15px;
+}
+
+.id-wrapper input[type="text"] {
+  width: 100%;
+  padding-right: 90px; /* 버튼 공간 확보 */
+  padding: 10px;
+  box-sizing: border-box;
+}
+.check-btn {
+  position: absolute;
+  top: 50%;
+  right: 10px;
+  transform: translateY(-75%);
+  padding: 6px 9px;
+  background-color: white;
+  border: 1px solid #ccc;
+  border-radius: 20px;
+  font-size: 12px;
+  cursor: pointer;
+  color: #333;
+}
+
+/* 선택된 카테고리 태그 스타일 */
+.category-tags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 5px;
+  margin-bottom: 10px;
+}
+
+.category-tag {
+  background-color: #d9d9d9;
+  padding: 1px 10px;
+  border-radius: 20px;
+  font-size: 13px;
+  display: flex;
+  align-items: center;
+}
+
+.category-tag .remove-btn {
+  background: none;
+  border: none;
+  margin-left: 5px;
+  cursor: pointer;
+  font-weight: bold;
+  font-size: 14px;
+}
+
+.log-btn {
+  width: 100%;
+  padding: 10px;
+  background-color: #000000;
+  color: white;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+}
+/* 가입 버튼 */
+.submit-btn {
+  width: 100%;
+  padding: 10px;
+  background-color: black;
+  color: white;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+  margin-top: 10px;
+}
+.agreement {
+  font-size: 12px;
+  display: flex; /* block 대신 flex로 변경 */
+  align-items: center; /* 수직 가운데 정렬 */
+  gap: 5px; /* 체크박스와 텍스트 사이 여백 */
+  margin-bottom: 15px;
+}
+
