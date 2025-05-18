@@ -1,8 +1,40 @@
 
-document.getElementById("signupForm").addEventListener("submit", function(e) {
+document.getElementById("signupForm").addEventListener("submit", async function(e) {
   e.preventDefault();
-  alert("회원가입 시도 중...");
+
+  // 선택된 카테고리 추출
+  const categories = [...document.querySelectorAll(".category-tag")]
+    .map(tag => tag.firstChild.textContent.trim());
+
+  const dto = {
+    username: document.getElementById("username").value,
+    userId: document.getElementById("userId").value,
+    password: document.getElementById("password").value,
+    confirmPassword: document.getElementById("confirm").value,
+    email: document.getElementById("email").value,
+    interestCategories: categories // 리스트로 보냄
+  };
+
+  try {
+    const response = await fetch("http://localhost:8080/api/signup", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(dto)
+    });
+
+    if (response.ok) {
+      alert("회원가입 성공!");
+      window.location.href = "/login.html";
+    } else {
+      alert("회원가입 실패");
+    }
+  } catch (err) {
+    console.error("에러 발생:", err);
+    alert("서버 오류");
+  }
 });
+
+
 document.addEventListener("DOMContentLoaded", () => {
   const categorySelect = document.getElementById("category");
   const selectedDiv = document.getElementById("selectedCategories");
@@ -36,3 +68,4 @@ document.addEventListener("DOMContentLoaded", () => {
     categorySelect.selectedIndex = 0;
   });
 });
+
