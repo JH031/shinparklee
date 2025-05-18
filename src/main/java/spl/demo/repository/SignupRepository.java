@@ -6,7 +6,8 @@ import spl.demo.entity.SignupEntity;
 import java.util.Optional;
 
 public interface SignupRepository extends JpaRepository<SignupEntity, Long> {
-    boolean existsByUsername(String userId); // 아이디 중복 확인
+
+    boolean existsByUserId(String userId);
 
     Optional<SignupEntity> findByUserId(String userId);
 }
