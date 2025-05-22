@@ -13,6 +13,7 @@ import spl.demo.dto.LoginDto;
 import spl.demo.dto.TokenResponse;
 import spl.demo.security.JwtUtil;
 
+@CrossOrigin(origins = {"http://localhost:5500", "http://127.0.0.1:5500"})  // CORS 설정 유지
 @RestController
 @RequestMapping("/api/login")
 public class LoginController {

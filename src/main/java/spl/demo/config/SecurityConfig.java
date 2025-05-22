@@ -36,7 +36,6 @@ public class SecurityConfig {
         DaoAuthenticationProvider provider = new DaoAuthenticationProvider();
         provider.setUserDetailsService(userDetailsService);
         provider.setPasswordEncoder(passwordEncoder());
-        // 사용자 없을 때 UsernameNotFoundException을 그대로 노출
         provider.setHideUserNotFoundExceptions(false);
         return provider;
     }
@@ -54,17 +53,14 @@ public class SecurityConfig {
                         .requestMatchers(
                                 "/api/signup/**",
                                 "/api/login/**",
-                                "/api/news/**"
+                                "/api/news/**"  
                         ).permitAll()
                         .anyRequest().authenticated()
                 )
-                // JWT 필터를 UsernamePasswordAuthenticationFilter 앞에 두기
-                .addFilterBefore(jwtFilter,
-                        UsernamePasswordAuthenticationFilter.class);
+                .addFilterBefore(jwtFilter, UsernamePasswordAuthenticationFilter.class);
 
         return http.build();
     }
-
 
     @Bean
     public AuthenticationManager authenticationManager(

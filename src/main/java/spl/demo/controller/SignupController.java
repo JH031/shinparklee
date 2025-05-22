@@ -5,6 +5,7 @@ import org.springframework.web.bind.annotation.*;
 import spl.demo.dto.SignupDto;
 import spl.demo.service.SignupService;
 
+@CrossOrigin(origins = {"http://localhost:5500", "http://127.0.0.1:5500"})  // 원격 브랜치의 설정 유지
 @RestController
 @RequestMapping("/api/signup")
 public class SignupController {
@@ -21,8 +22,8 @@ public class SignupController {
         return ResponseEntity.ok("회원가입 성공");
     }
 
-    @GetMapping("/check") //ID 중복체크
-    public ResponseEntity<Boolean> checkUsername(@RequestParam String userId) {
+    @GetMapping("/check") // ID 중복 체크
+    public ResponseEntity<Boolean> checkUsername(@RequestParam("userId") String userId) {
         return ResponseEntity.ok(signupService.isUsernameTaken(userId));
     }
 }
