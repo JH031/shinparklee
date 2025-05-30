@@ -19,8 +19,11 @@ public class NaverNewsCrawler {
             Elements headlineLinks = doc.select("a[href^=https://n.news.naver.com/mnews/article/]");
 
             int savedCount = 0;
+            int limit = 10; // ✅ 최대 10개로 제한
 
             for (Element linkEl : headlineLinks) {
+                if (savedCount >= limit) break; // ✅ 10개 저장되면 종료
+
                 String link = linkEl.attr("href");
 
                 // newsId 생성: article/언론사ID/기사ID
