@@ -27,21 +27,25 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
         String uri = request.getRequestURI();
 
-        // 🔒 로그인/회원가입 요청은 인증 없이 통과시킴
-        if (uri.startsWith("/api/signup") || uri.startsWith("/api/login")) {
+        // ✅ 인증 없이 통과시킬 경로들 (회원가입, 로그인, 뉴스 크롤링)
+        if (uri.startsWith("/api/signup") || uri.startsWith("/api/login") || uri.startsWith("/api/news")) {
             filterChain.doFilter(request, response);
             return;
         }
 
-        // ⚙️ 그 외 요청은 JWT 검사
+        // ⚙️ 나머지 요청은 JWT 검사
         String header = request.getHeader("Authorization");
+
         if (header != null && header.startsWith("Bearer ")) {
             String token = header.substring(7);
+
             if (jwtUtil.validateToken(token)) {
                 String userId = jwtUtil.getUserId(token);
                 UserDetails userDetails = userDetailsService.loadUserByUsername(userId);
+
                 UsernamePasswordAuthenticationToken auth =
                         new UsernamePasswordAuthenticationToken(userDetails, null, userDetails.getAuthorities());
+
                 SecurityContextHolder.getContext().setAuthentication(auth);
             }
         }
