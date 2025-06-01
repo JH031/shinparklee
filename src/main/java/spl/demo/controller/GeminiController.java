@@ -17,7 +17,7 @@ public class GeminiController {
     @GetMapping("/gemini")
     public ResponseEntity<String> getAnswer(@RequestParam("prompt") String prompt) {
         try {
-            String result = geminiService.askGemini(prompt);
+            String result = geminiService.summarizeTo4Lines(prompt);
             return ResponseEntity.ok(result);
         } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
