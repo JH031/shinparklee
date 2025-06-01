@@ -12,8 +12,8 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 import org.springframework.web.cors.CorsConfiguration;
+import org.springframework.web.cors.CorsConfigurationSource;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
-import org.springframework.web.filter.CorsFilter;
 import spl.demo.security.CustomUserDetailsService;
 import spl.demo.security.JwtAuthenticationFilter;
 import spl.demo.security.JwtUtil;
@@ -57,12 +57,13 @@ public class SecurityConfig {
                         .requestMatchers(
                                 "/api/signup/**",
                                 "/api/login/**",
-                                "/api/news/**"
+                                "/api/news/**",
+                                "/gemini"
                         ).permitAll()
                         .anyRequest().authenticated()
                 )
                 .addFilterBefore(jwtFilter, UsernamePasswordAuthenticationFilter.class)
-                .cors(); // 🔥 CORS 활성화 추가
+                .cors(cors -> cors.configurationSource(corsConfigurationSource())); // ✅ 수정된 방식
 
         return http.build();
     }
@@ -72,9 +73,8 @@ public class SecurityConfig {
         return config.getAuthenticationManager();
     }
 
-    // ✅ 모든 경로에 대해 CORS 허용 설정
     @Bean
-    public CorsFilter corsFilter() {
+    public CorsConfigurationSource corsConfigurationSource() {
         CorsConfiguration config = new CorsConfiguration();
         config.setAllowedOriginPatterns(List.of("*"));
         config.setAllowedMethods(List.of("GET", "POST", "PUT", "DELETE", "OPTIONS"));
@@ -83,7 +83,7 @@ public class SecurityConfig {
 
         UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
         source.registerCorsConfiguration("/**", config);
-
-        return new CorsFilter(source);
+        return source;
     }
+
 }
