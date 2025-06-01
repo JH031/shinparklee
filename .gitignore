@@ -39,5 +39,5 @@ out/
 ### VS Code ###
 .vscode/
 shinparklee/
-application.yml
-application.properties
+src/main/resources/application.properties
+src/main/resources/application.yml
