@@ -58,7 +58,8 @@ public class SecurityConfig {
                                 "/api/signup/**",
                                 "/api/login/**",
                                 "/api/news/**",
-                                "/gemini"
+                                "/gemini",
+                                "/api/summary/generate/all"
                         ).permitAll()
                         .anyRequest().authenticated()
                 )
