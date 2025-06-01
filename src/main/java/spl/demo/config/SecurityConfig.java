@@ -59,7 +59,9 @@ public class SecurityConfig {
                                 "/api/login/**",
                                 "/api/news/**",
                                 "/gemini",
-                                "/api/summary/generate/all"
+                                "/api/summary/generate/all",
+                                "/swagger-ui/**",
+                                "/v3/api-docs/**"
                         ).permitAll()
                         .anyRequest().authenticated()
                 )
