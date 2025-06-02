@@ -1,12 +1,11 @@
 package spl.demo.service;
 
-import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.*;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
-import spl.demo.config.GeminiApiConfig;
+import spl.demo.entity.SummaryStyle;
 
 import java.util.List;
 import java.util.Map;
@@ -15,36 +14,52 @@ import java.util.Map;
 @RequiredArgsConstructor
 public class GeminiService {
 
-    private final GeminiApiConfig config;
+    @Value("${gemini.api.url}")  // 변경됨
+    private String geminiUrl;
+
+    @Value("${gemini.api.key}")
+    private String apiKey;
+
+
     private final RestTemplate restTemplate = new RestTemplate();
-    private final ObjectMapper objectMapper = new ObjectMapper();
 
-    public String summarizeTo4Lines(String content) throws Exception {
-        String prompt = "다음 뉴스 내용을 4줄로 요약해줘:\n" + content;
-
-        Map<String, Object> requestBody = Map.of(
-                "contents", List.of(
-                        Map.of("parts", List.of(
-                                Map.of("text", prompt)
-                        ))
-                )
-        );
+    public String generateSummary(String prompt) {
+        Map<String, Object> part = Map.of("text", prompt);
+        Map<String, Object> contentPart = Map.of("parts", List.of(part));
+        Map<String, Object> body = Map.of("contents", List.of(contentPart));
 
         HttpHeaders headers = new HttpHeaders();
         headers.setContentType(MediaType.APPLICATION_JSON);
 
-        HttpEntity<Map<String, Object>> entity = new HttpEntity<>(requestBody, headers);
+        HttpEntity<Map<String, Object>> request = new HttpEntity<>(body, headers);
+        String requestUrl = geminiUrl + "?key=" + apiKey;
 
-        String fullUrl = config.getUrl() + "?key=" + config.getKey();
-        ResponseEntity<String> response = restTemplate.exchange(
-                fullUrl,
-                HttpMethod.POST,
-                entity,
-                String.class
-        );
+        try {
+            ResponseEntity<Map> response = restTemplate.postForEntity(requestUrl, request, Map.class);
+            List<Map<String, Object>> candidates = (List<Map<String, Object>>) response.getBody().get("candidates");
+            Map<String, Object> contentMap = (Map<String, Object>) candidates.get(0).get("content");
+            List<Map<String, String>> parts = (List<Map<String, String>>) contentMap.get("parts");
+            return parts.get(0).get("text");
+        } catch (Exception e) {
+            e.printStackTrace();
+            return "요약 중 오류 발생";
+        }
+    }
 
-        // 응답에서 요약 텍스트 추출
-        JsonNode root = objectMapper.readTree(response.getBody());
-        return root.path("candidates").get(0).path("content").path("parts").get(0).path("text").asText();
+    // 기본 4~5줄 요약
+    public String summarizeTo4Lines(String content) {
+        String prompt = "다음 뉴스를 4~5문장으로 요약해줘.\n\n" + content;
+        return generateSummary(prompt);
+    }
+
+    //  말투 기반 요약
+    public String generateStyledSummary(String content, SummaryStyle style) {
+        String stylePrompt = switch (style) {
+            case FUNNY -> "재밌게 요약해줘.";
+            case SIMPLE -> "쉽게 요약해줘.";
+            case FRIENDLY -> "친구한테 말해듯이 요약해줘.";
+            default -> "요약해줘.";
+        };
+        return generateSummary(stylePrompt + "\n\n" + content);
     }
 }

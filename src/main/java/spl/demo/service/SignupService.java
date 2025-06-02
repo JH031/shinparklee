@@ -28,12 +28,17 @@ public class SignupService {
             throw new IllegalArgumentException("비밀번호가 일치하지 않습니다.");
         }
 
+        if (dto.getStyle() == null) {
+            throw new IllegalArgumentException("요약 말투를 반드시 선택해야 합니다.");
+        }
+
         SignupEntity user = new SignupEntity();
         user.setUsername(dto.getUsername()); // 유저 이름은 중복 허용
         user.setUserId(dto.getUserId());     // 로그인용 ID (중복 불가)
         user.setPassword(passwordEncoder.encode(dto.getPassword()));
         user.setEmail(dto.getEmail());
         user.setInterestCategories(dto.getInterestCategories());
+        user.setStyle(dto.getStyle());       // ✅ 요약 말투 저장
 
         signupRepository.save(user);
     }

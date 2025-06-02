@@ -34,4 +34,9 @@ public class SignupEntity {
     @Enumerated(EnumType.STRING)
     private List<InterestCategoryEntity> interestCategories;
 
+    @Enumerated(EnumType.STRING)
+    @Column(nullable = false)
+    private SummaryStyle style;
+
+
 }

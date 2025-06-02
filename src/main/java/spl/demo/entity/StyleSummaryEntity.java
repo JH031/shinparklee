@@ -4,13 +4,14 @@ import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
-import java.time.LocalDateTime;
-
 @Entity
 @Getter
 @NoArgsConstructor
-@Table(name = "summary")
-public class SummaryEntity {
+@Table(
+        name = "style_summary",
+        uniqueConstraints = @UniqueConstraint(columnNames = {"news_id", "style"}) // ✅ 추가
+)
+public class StyleSummaryEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -23,19 +24,17 @@ public class SummaryEntity {
     @Column(name = "summary_text", nullable = false, columnDefinition = "TEXT")
     private String summaryText;
 
-    @Column(name = "created_at", nullable = false)
-    private LocalDateTime createdAt;
+    @Enumerated(EnumType.STRING)
+    @Column(name = "style", nullable = false)
+    private SummaryStyle style;
 
-    // 생성자 - 기본 요약
-    public SummaryEntity(NewsEntity news, String summaryText) {
+    public StyleSummaryEntity(NewsEntity news, String summaryText, SummaryStyle style) {
         this.news = news;
         this.summaryText = summaryText;
-        this.createdAt = LocalDateTime.now();
+        this.style = style;
     }
 
-    // 요약문 갱신
     public void updateSummaryText(String newText) {
         this.summaryText = newText;
-        this.createdAt = LocalDateTime.now();
     }
 }

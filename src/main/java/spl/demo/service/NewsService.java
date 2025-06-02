@@ -6,8 +6,11 @@ import org.springframework.transaction.annotation.Transactional;
 import spl.demo.dto.NewsDto;
 import spl.demo.entity.InterestCategoryEntity;
 import spl.demo.entity.NewsEntity;
+import spl.demo.entity.StyleSummaryEntity;
 import spl.demo.entity.SummaryEntity;
+import spl.demo.entity.SummaryStyle;
 import spl.demo.repository.NewsRepository;
+import spl.demo.repository.StyleSummaryRepository;
 import spl.demo.repository.SummaryRepository;
 
 import java.util.List;
@@ -18,9 +21,10 @@ public class NewsService {
 
     private final NewsRepository newsRepository;
     private final SummaryRepository summaryRepository;
+    private final StyleSummaryRepository styleSummaryRepository;
     private final GeminiService geminiService;
 
-    // ✅ 뉴스 저장 (중복 방지 + 큰따옴표 제거)
+    // 뉴스 저장 (중복 방지 + 큰따옴표 제거)
     public void saveNewsIfNotExists(NewsDto dto) {
         if (!newsRepository.existsByNewsId(dto.getNewsId())) {
             NewsEntity newsEntity = new NewsEntity();
@@ -28,7 +32,7 @@ public class NewsService {
             newsEntity.setTitle(dto.getTitle());
             newsEntity.setUrl(dto.getUrl());
 
-            // ✅ 큰따옴표 제거
+            // 큰따옴표 제거
             String cleanedContent = dto.getContent().replace("\"", "");
             newsEntity.setContent(cleanedContent);
 
@@ -48,20 +52,32 @@ public class NewsService {
         return newsRepository.findByCategory(category);
     }
 
-    // ✅ Gemini를 활용한 뉴스 요약 → Summary DB 저장
+    // ✅ Gemini를 활용한 뉴스 요약 → 기본 요약 + 말투 요약 모두 저장
     @Transactional
     public void summarizeAllNews() {
         List<NewsEntity> newsList = newsRepository.findAll();
 
         for (NewsEntity news : newsList) {
             try {
+                //  기본 요약 저장
                 if (!summaryRepository.existsByNews(news)) {
                     String summaryText = geminiService.summarizeTo4Lines(news.getContent());
-
-                    // 생성자 기반 저장으로 최적화 ✅
                     SummaryEntity summary = new SummaryEntity(news, summaryText);
                     summaryRepository.save(summary);
                 }
+
+                //  말투 요약 저장 (모든 말투)
+                for (SummaryStyle style : SummaryStyle.values()) {
+                    if (style == SummaryStyle.DEFAULT) continue;
+
+                    boolean exists = styleSummaryRepository.findByNewsIdAndStyle(news.getId(), style).isPresent();
+                    if (!exists) {
+                        String styled = geminiService.generateStyledSummary(news.getContent(), style);
+                        StyleSummaryEntity styledSummary = new StyleSummaryEntity(news, styled, style);
+                        styleSummaryRepository.save(styledSummary);
+                    }
+                }
+
             } catch (Exception e) {
                 System.err.println("❌ 요약 실패 - 뉴스 ID: " + news.getId());
                 e.printStackTrace();
