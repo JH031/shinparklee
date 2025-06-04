@@ -9,7 +9,7 @@ import spl.demo.crawler.HotTopicCrawler;
 import spl.demo.service.NewsService;
 
 @RestController
-@RequestMapping("/api/crawler")
+@RequestMapping("/api/crawler") // 뉴스 크롤링 관련 api 기본 경로
 @RequiredArgsConstructor
 public class NewsCrawlingController {
 

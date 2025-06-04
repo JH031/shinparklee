@@ -1,5 +1,6 @@
 package spl.demo.controller;
 
+import io.swagger.v3.oas.annotations.Operation;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -21,7 +22,7 @@ public class NewsController {
         this.newsService = newsService;
     }
 
-    // ✅ 크롤링 실행 (sid → enum 변환 후 실행)
+    @Operation(summary = "카테고리별 크롤링")
     @PostMapping("/crawl/{sid}")
     public ResponseEntity<String> crawlAndSave(@PathVariable("sid") String sid) {
         InterestCategoryEntity category = switch (sid) {
@@ -37,8 +38,37 @@ public class NewsController {
         NaverNewsCrawler.crawlCategoryNews(sid, category, newsService);
         return ResponseEntity.ok("크롤링 및 저장 완료: " + category.name());
     }
+    @Operation(summary = "모든 카테고리 크롤링")
+    @PostMapping("/crawl/all")
+    public ResponseEntity<String> crawlAllCategories() {
+        StringBuilder result = new StringBuilder();
 
-    // ✅ 뉴스 목록 조회 (전체 또는 enum 카테고리 필터링)
+        // 각 SID에 해당하는 카테고리 매핑
+        String[][] sidCategoryPairs = {
+                {"100", "Politics"},
+                {"101", "Economy"},
+                {"102", "Society"},
+                {"103", "LifestyleCulture"},
+                {"104", "Entertainment"},
+                {"105", "ITScience"}
+        };
+
+        for (String[] pair : sidCategoryPairs) {
+            String sid = pair[0];
+            InterestCategoryEntity category = InterestCategoryEntity.valueOf(pair[1]);
+            try {
+                NaverNewsCrawler.crawlCategoryNews(sid, category, newsService);
+                result.append("✅ ").append(category.name()).append(" 크롤링 완료\n");
+            } catch (Exception e) {
+                result.append("❌ ").append(category.name()).append(" 실패\n");
+            }
+        }
+
+        return ResponseEntity.ok(result.toString());
+    }
+
+
+    @Operation(summary = "뉴스 목록 조회")
     @GetMapping
     public ResponseEntity<List<NewsEntity>> getNews(
             @RequestParam(name = "category", required = false) InterestCategoryEntity category

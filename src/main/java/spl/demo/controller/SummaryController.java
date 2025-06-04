@@ -27,6 +27,7 @@ public class SummaryController {
     private final GeminiService geminiService;
 
     // ✅ 기본 요약 전체 생성
+    @Operation(summary = "기본 말투로 요약")
     @PostMapping("/generate/all")
     public ResponseEntity<String> summarizeAllNews() {
         newsService.summarizeAllNews();
@@ -34,6 +35,7 @@ public class SummaryController {
     }
 
     // ✅ 말투 요약 전체 생성 (ID 기반으로 수정됨)
+    @Operation(summary = "지정 말투로 요약")
     @PostMapping("/generate/all/style")
     public ResponseEntity<String> summarizeAllNewsWithStyle(@RequestParam("style") SummaryStyle style) {
         int savedCount = 0;

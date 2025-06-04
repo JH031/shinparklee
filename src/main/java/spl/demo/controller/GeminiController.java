@@ -1,5 +1,6 @@
 package spl.demo.controller;
 
+import io.swagger.v3.oas.annotations.Operation;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -20,6 +21,7 @@ public class GeminiController {
     private final StyleSummaryRepository styleSummaryRepository;
 
     // ✅ 말투 요약용 엔드포인트
+    @Operation(summary = "말투 스타일받아서 요약")
     @PostMapping("/style")
     public ResponseEntity<String> summarizeWithStyle(
             @RequestParam(name = "newsId") Long newsId,

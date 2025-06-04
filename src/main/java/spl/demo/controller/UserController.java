@@ -10,7 +10,7 @@ import spl.demo.security.CustomUserDetails;
 import spl.demo.service.UserService;
 
 @RestController
-@RequestMapping("/api/users")
+@RequestMapping("/api/users") //회원관련 api 기본 경로
 @RequiredArgsConstructor
 public class UserController {
 
