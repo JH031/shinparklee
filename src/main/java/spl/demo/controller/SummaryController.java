@@ -8,10 +8,9 @@ import spl.demo.entity.StyleSummaryEntity;
 import spl.demo.entity.SummaryStyle;
 import spl.demo.repository.NewsRepository;
 import spl.demo.repository.StyleSummaryRepository;
-import spl.demo.repository.SummaryRepository;
 import spl.demo.service.GeminiService;
 import spl.demo.service.NewsService;
-import spl.demo.service.SummaryService;
+
 
 @RestController
 @RequiredArgsConstructor
@@ -20,7 +19,6 @@ public class SummaryController {
 
     private final NewsService newsService;
     private final NewsRepository newsRepository;
-    private final SummaryService summaryService;
     private final StyleSummaryRepository styleSummaryRepository;
     private final GeminiService geminiService;
 
