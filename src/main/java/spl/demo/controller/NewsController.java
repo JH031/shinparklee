@@ -79,4 +79,16 @@ public class NewsController {
             return ResponseEntity.ok(newsService.getNewsByCategory(category));
         }
     }
+
+    @Operation(summary = "모든 뉴스 제목만 조회")
+    @GetMapping("/titles")
+    public ResponseEntity<List<String>> getAllNewsTitles() {
+        List<String> titles = newsService.getAllNews()
+                .stream()
+                .map(NewsEntity::getTitle)
+                .toList();
+
+        return ResponseEntity.ok(titles);
+    }
+
 }

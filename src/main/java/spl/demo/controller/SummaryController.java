@@ -73,27 +73,31 @@ public class SummaryController {
     public ResponseEntity<List<SummaryNewsDto>> getHotTopicSummarizedNews() {
         return ResponseEntity.ok(newsService.getHotTopicSummariesWithAllStyles());
     }
+
     @GetMapping("/basic")
-    @Operation(summary = "기본 요약 - 뉴스 제목만 조회")
+    @Operation(summary = "기본 요약 - 뉴스 제목과 요약만 조회")
     public ResponseEntity<List<SummaryNewsDto>> getAllBasicSummaries() {
         List<SummaryEntity> summaries = summaryRepository.findAll();
         List<SummaryNewsDto> result = summaries.stream()
                 .map(summary -> {
-                    SummaryNewsDto dto = new SummaryNewsDto(
+                    EnumMap<SummaryStyle, String> map = new EnumMap<>(SummaryStyle.class);
+                    map.put(SummaryStyle.DEFAULT, summary.getSummaryText());
+
+                    return new SummaryNewsDto(
                             null,
                             summary.getNews().getTitle(),
-                            null, // url 없음
-                            null, // createdAt 없음
-                            null  // summaries 없음
+                            null,
+                            null,
+                            map
                     );
-                    return dto;
                 })
                 .toList();
         return ResponseEntity.ok(result);
     }
 
+
     @GetMapping("/style")
-    @Operation(summary = "스타일 요약 - 뉴스 전체 정보와 요약")
+    @Operation(summary = "스타일 요약 - 뉴스 제목과 요약만 조회")
     public ResponseEntity<List<SummaryNewsDto>> getAllStyleSummaries(@RequestParam("style") SummaryStyle style) {
         List<StyleSummaryEntity> summaries = styleSummaryRepository.findByStyle(style);
         List<SummaryNewsDto> result = summaries.stream()
@@ -102,9 +106,9 @@ public class SummaryController {
                     map.put(style, summary.getSummaryText());
 
                     return new SummaryNewsDto(
-                            summary.getNews().getNewsId(),
+                            null,
                             summary.getNews().getTitle(),
-                            summary.getNews().getUrl(),
+                            null,
                             null,
                             map
                     );
@@ -112,6 +116,7 @@ public class SummaryController {
                 .toList();
         return ResponseEntity.ok(result);
     }
+
 
 
 
