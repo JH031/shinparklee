@@ -1,5 +1,6 @@
 package spl.demo.controller;
 
+import io.swagger.v3.oas.annotations.Operation;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -14,6 +15,7 @@ public class NewsCrawlingController {
 
     private final NewsService newsService;
 
+    @Operation(summary = "핫토픽 뉴스 생성하기")
     @PostMapping("/hot-news")
     public String crawlHotNews() {
         HotTopicCrawler.crawlYonhapHotTopics(newsService);  // ✅ HotNewsService 제거됨
