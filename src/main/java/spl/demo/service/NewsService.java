@@ -4,6 +4,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import spl.demo.dto.NewsDto;
+import spl.demo.dto.SummaryNewsDto;
 import spl.demo.entity.InterestCategoryEntity;
 import spl.demo.entity.NewsEntity;
 import spl.demo.entity.StyleSummaryEntity;
@@ -13,7 +14,11 @@ import spl.demo.repository.NewsRepository;
 import spl.demo.repository.StyleSummaryRepository;
 import spl.demo.repository.SummaryRepository;
 
+import java.util.EnumMap;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -97,5 +102,41 @@ public class NewsService {
             newsRepository.save(newsEntity);
         }
     }
+    public List<SummaryNewsDto> getHotTopicSummariesWithAllStyles() {
+        List<NewsEntity> hotNewsList = newsRepository.findByHotTopicTrue();
+
+        List<SummaryEntity> baseSummaries = summaryRepository.findByNewsIn(hotNewsList);
+        List<StyleSummaryEntity> styleSummaries = styleSummaryRepository.findByNewsIn(hotNewsList);
+
+        // 요약을 뉴스 ID 기준으로 매핑
+        Map<Long, EnumMap<SummaryStyle, String>> summaryMap = new HashMap<>();
+
+        // 기본 요약 넣기
+        for (SummaryEntity base : baseSummaries) {
+            summaryMap
+                    .computeIfAbsent(base.getNews().getId(), k -> new EnumMap<>(SummaryStyle.class))
+                    .put(SummaryStyle.DEFAULT, base.getSummaryText());
+        }
+
+        // 스타일 요약 넣기
+        for (StyleSummaryEntity style : styleSummaries) {
+            summaryMap
+                    .computeIfAbsent(style.getNews().getId(), k -> new EnumMap<>(SummaryStyle.class))
+                    .put(style.getStyle(), style.getSummaryText());
+        }
+
+        return hotNewsList.stream()
+                .filter(news -> summaryMap.containsKey(news.getId()))
+                .map(news -> SummaryNewsDto.builder()
+                        .newsId(news.getNewsId())
+                        .title(news.getTitle())
+                        .url(news.getUrl())
+                        .createdAt(news.getCreatedAt())
+                        .summaries(summaryMap.get(news.getId()))
+                        .build()
+                )
+                .collect(Collectors.toList());
+    }
+
 
 }

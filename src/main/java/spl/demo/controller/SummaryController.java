@@ -1,8 +1,10 @@
 package spl.demo.controller;
 
+import io.swagger.v3.oas.annotations.Operation;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import spl.demo.dto.SummaryNewsDto;
 import spl.demo.entity.NewsEntity;
 import spl.demo.entity.StyleSummaryEntity;
 import spl.demo.entity.SummaryStyle;
@@ -10,6 +12,8 @@ import spl.demo.repository.NewsRepository;
 import spl.demo.repository.StyleSummaryRepository;
 import spl.demo.service.GeminiService;
 import spl.demo.service.NewsService;
+
+import java.util.List;
 
 
 @RestController
@@ -56,5 +60,9 @@ public class SummaryController {
 
         return ResponseEntity.ok("총 " + savedCount + "건 신규 요약 (" + style + ") 저장 완료!");
     }
-
+    @Operation(summary = "핫토픽 뉴스 조회")
+    @GetMapping("/hot")
+    public ResponseEntity<List<SummaryNewsDto>> getHotTopicSummarizedNews() {
+        return ResponseEntity.ok(newsService.getHotTopicSummariesWithAllStyles());
+    }
 }
