@@ -9,5 +9,6 @@ public class NewsDto {
     private String title;
     private String url;
     private String content;
+    private String imageUrl;
     private InterestCategoryEntity category;
 }

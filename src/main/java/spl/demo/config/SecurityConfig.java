@@ -60,11 +60,11 @@ public class SecurityConfig {
                                 "/api/login/**",
                                 "/api/news/**",
                                 "/api/v1/summarize/**",
-                                "/api/summary/generate/all/style",
                                 "/gemini",
-                                "/api/summary/generate/all",
+                                "/api/summary/generate/**",
                                 "/swagger-ui/**",
-                                "/v3/api-docs/**"
+                                "/v3/api-docs/**",
+                                "/api/crawler/**"
                         ).permitAll()
                         .anyRequest().authenticated()
                 )

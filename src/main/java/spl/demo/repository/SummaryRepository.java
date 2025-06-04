@@ -9,5 +9,6 @@ import java.util.Optional;
 
 public interface SummaryRepository extends JpaRepository<SummaryEntity, Long> {
     boolean existsByNews(NewsEntity news);
+    Optional<SummaryEntity> findByNews_Id(Long newsId);
 
 }

@@ -7,5 +7,6 @@ public enum InterestCategoryEntity
     Society,
     LifestyleCulture,
     ITScience,
-    Entertainment
+    Entertainment,
+    HOT_TOPIC
 }

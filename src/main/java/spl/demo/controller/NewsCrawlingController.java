@@ -1,0 +1,23 @@
+package spl.demo.controller;
+
+import lombok.RequiredArgsConstructor;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
+import spl.demo.crawler.HotTopicCrawler;
+import spl.demo.service.NewsService;
+
+@RestController
+@RequestMapping("/api/crawler")
+@RequiredArgsConstructor
+public class NewsCrawlingController {
+
+    private final NewsService newsService;
+
+    @PostMapping("/hot-news")
+    public String crawlHotNews() {
+        HotTopicCrawler.crawlYonhapHotTopics(newsService);  // ✅ HotNewsService 제거됨
+        return "✅ 연합뉴스 핫토픽 크롤링 완료";
+    }
+}
+

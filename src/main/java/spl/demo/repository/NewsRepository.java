@@ -13,4 +13,6 @@ public interface NewsRepository extends JpaRepository<NewsEntity, Long> {
 
     // ✅ 카테고리별 뉴스 목록 조회
     List<NewsEntity> findByCategory(InterestCategoryEntity category);
+
+    List<NewsEntity> findByHotTopicTrue();
 }

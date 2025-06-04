@@ -11,6 +11,7 @@ import spl.demo.repository.StyleSummaryRepository;
 import spl.demo.repository.SummaryRepository;
 import spl.demo.service.GeminiService;
 import spl.demo.service.NewsService;
+import spl.demo.service.SummaryService;
 
 @RestController
 @RequiredArgsConstructor
@@ -19,7 +20,7 @@ public class SummaryController {
 
     private final NewsService newsService;
     private final NewsRepository newsRepository;
-    private final SummaryRepository summaryRepository;
+    private final SummaryService summaryService;
     private final StyleSummaryRepository styleSummaryRepository;
     private final GeminiService geminiService;
 
@@ -57,4 +58,5 @@ public class SummaryController {
 
         return ResponseEntity.ok("총 " + savedCount + "건 신규 요약 (" + style + ") 저장 완료!");
     }
+
 }

@@ -6,6 +6,7 @@ import lombok.Setter;
 
 import java.time.LocalDateTime;
 
+@Setter
 @Getter
 @Entity
 @Table(name = "news")
@@ -40,6 +41,9 @@ public class NewsEntity {
     @Setter
     @Column(nullable = false)
     private LocalDateTime createdAt; // 등록 시간
+
+    @Column(name = "is_hot_topic")
+    private boolean hotTopic;
 
     // 생성 시 createdAt 자동 설정
     @PrePersist

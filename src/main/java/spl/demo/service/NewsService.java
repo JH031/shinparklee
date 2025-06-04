@@ -84,4 +84,18 @@ public class NewsService {
             }
         }
     }
+    public void saveHotTopicIfNotExists(NewsDto dto) {
+        if (!newsRepository.existsByNewsId(dto.getNewsId())) {
+            NewsEntity newsEntity = new NewsEntity();
+            newsEntity.setNewsId(dto.getNewsId());
+            newsEntity.setTitle(dto.getTitle());
+            newsEntity.setUrl(dto.getUrl());
+            newsEntity.setContent(dto.getContent().replace("\"", ""));
+            newsEntity.setCategory(InterestCategoryEntity.HOT_TOPIC);      // 핫토픽은 카테고리 없이
+            newsEntity.setHotTopic(true);       // ✅ 핫토픽 표시
+
+            newsRepository.save(newsEntity);
+        }
+    }
+
 }
