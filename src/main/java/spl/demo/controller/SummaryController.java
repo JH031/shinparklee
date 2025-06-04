@@ -7,11 +7,15 @@ import org.springframework.web.bind.annotation.*;
 import spl.demo.dto.SummaryNewsDto;
 import spl.demo.entity.NewsEntity;
 import spl.demo.entity.StyleSummaryEntity;
+import spl.demo.entity.SummaryEntity;
 import spl.demo.entity.SummaryStyle;
 import spl.demo.repository.NewsRepository;
 import spl.demo.repository.StyleSummaryRepository;
+import spl.demo.repository.SummaryRepository;
 import spl.demo.service.GeminiService;
 import spl.demo.service.NewsService;
+import java.util.EnumMap;
+
 
 import java.util.List;
 
@@ -25,6 +29,8 @@ public class SummaryController {
     private final NewsRepository newsRepository;
     private final StyleSummaryRepository styleSummaryRepository;
     private final GeminiService geminiService;
+    private final SummaryRepository summaryRepository;
+
 
     // ✅ 기본 요약 전체 생성
     @Operation(summary = "기본 말투로 요약")
@@ -67,4 +73,46 @@ public class SummaryController {
     public ResponseEntity<List<SummaryNewsDto>> getHotTopicSummarizedNews() {
         return ResponseEntity.ok(newsService.getHotTopicSummariesWithAllStyles());
     }
+    @GetMapping("/basic")
+    @Operation(summary = "기본 요약 - 뉴스 제목만 조회")
+    public ResponseEntity<List<SummaryNewsDto>> getAllBasicSummaries() {
+        List<SummaryEntity> summaries = summaryRepository.findAll();
+        List<SummaryNewsDto> result = summaries.stream()
+                .map(summary -> {
+                    SummaryNewsDto dto = new SummaryNewsDto(
+                            null,
+                            summary.getNews().getTitle(),
+                            null, // url 없음
+                            null, // createdAt 없음
+                            null  // summaries 없음
+                    );
+                    return dto;
+                })
+                .toList();
+        return ResponseEntity.ok(result);
+    }
+
+    @GetMapping("/style")
+    @Operation(summary = "스타일 요약 - 뉴스 전체 정보와 요약")
+    public ResponseEntity<List<SummaryNewsDto>> getAllStyleSummaries(@RequestParam("style") SummaryStyle style) {
+        List<StyleSummaryEntity> summaries = styleSummaryRepository.findByStyle(style);
+        List<SummaryNewsDto> result = summaries.stream()
+                .map(summary -> {
+                    EnumMap<SummaryStyle, String> map = new EnumMap<>(SummaryStyle.class);
+                    map.put(style, summary.getSummaryText());
+
+                    return new SummaryNewsDto(
+                            summary.getNews().getNewsId(),
+                            summary.getNews().getTitle(),
+                            summary.getNews().getUrl(),
+                            null,
+                            map
+                    );
+                })
+                .toList();
+        return ResponseEntity.ok(result);
+    }
+
+
+
 }

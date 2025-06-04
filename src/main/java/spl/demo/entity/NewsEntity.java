@@ -42,8 +42,9 @@ public class NewsEntity {
     @Column(nullable = false)
     private LocalDateTime createdAt; // 등록 시간
 
-    @Column(name = "is_hot_topic")
-    private boolean hotTopic;
+    @Setter
+    @Column(name = "is_hot_topic", nullable = false)
+    private Boolean hotTopic = false; // 기본값 false로 설정
 
     // 생성 시 createdAt 자동 설정
     @PrePersist

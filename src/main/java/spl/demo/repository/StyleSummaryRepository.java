@@ -11,4 +11,6 @@ import java.util.Optional;
 public interface StyleSummaryRepository extends JpaRepository<StyleSummaryEntity, Long> {
     Optional<StyleSummaryEntity> findByNewsIdAndStyle(Long newsId, SummaryStyle style);
     List<StyleSummaryEntity> findByNewsIn(List<NewsEntity> newsList);
+    List<StyleSummaryEntity> findByStyle(SummaryStyle style);
+
 }
