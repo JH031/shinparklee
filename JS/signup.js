@@ -6,13 +6,17 @@ document.getElementById("signupForm").addEventListener("submit", async function(
   const categories = [...document.querySelectorAll(".category-tag")]
     .map(tag => tag.firstChild.textContent.trim());
 
+  const style = document.getElementById("style").value;
+
+
   const dto = {
     username: document.getElementById("username").value,
     userId: document.getElementById("userId").value,
     password: document.getElementById("password").value,
     confirmPassword: document.getElementById("confirm").value,
     email: document.getElementById("email").value,
-    interestCategories: categories // 리스트로 보냄
+    interestCategories: categories, // 리스트로 보냄
+    style: style
   };
 
   try {
@@ -23,9 +27,15 @@ document.getElementById("signupForm").addEventListener("submit", async function(
     });
 
     if (response.ok) {
-      alert("회원가입 성공!");
-      window.location.href = "/login.html";
-    } else {
+  // 🌟 카테고리도 localStorage에 저장
+    localStorage.setItem('isLoggedIn', 'true');
+    localStorage.setItem('userId', dto.userId);
+    localStorage.setItem('interestCategories', JSON.stringify(dto.interestCategories));
+
+    alert("회원가입 성공!");
+    window.location.href = "/login.html";
+  }
+ else {
       alert("회원가입 실패");
     }
   } catch (err) {
@@ -33,6 +43,35 @@ document.getElementById("signupForm").addEventListener("submit", async function(
     alert("서버 오류");
   }
 });
+
+document.getElementById("checkIdBtn").addEventListener("click", async function () {
+  const userIdInput = document.getElementById("userId").value.trim();
+  const messageEl = document.getElementById("userIdMessage");
+
+  if (!userIdInput) {
+    messageEl.textContent = "아이디를 입력해주세요.";
+    messageEl.className = "message error";
+    return;
+  }
+
+  try {
+    const response = await fetch(`http://localhost:8080/api/signup/check?userId=${encodeURIComponent(userIdInput)}`);
+    const isTaken = await response.json();
+
+    if (isTaken) {
+      messageEl.textContent = "중복된 아이디입니다.";
+      messageEl.className = "message error";
+    } else {
+      messageEl.textContent = "사용 가능한 아이디입니다!";
+      messageEl.className = "message success";
+    }
+  } catch (err) {
+    console.error("중복 확인 중 에러:", err);
+    messageEl.textContent = "서버 오류가 발생했습니다.";
+    messageEl.className = "message error";
+  }
+});
+
 
 
 document.addEventListener("DOMContentLoaded", () => {

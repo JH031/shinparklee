@@ -1,19 +1,18 @@
-
+/* ============================== */
+/* 공통 스타일 (전체 페이지 공통) */
+/* ============================== */
 body {
   font-family: Arial, sans-serif;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  height: 100vh;
   margin: 0;
-}
-.container {
-  width: 300px;
+  padding: 0;
 }
 h1, h2 {
   text-align: center;
 }
-input[type="text"], input[type="password"], input[type="email"], select {
+input[type="text"],
+input[type="password"],
+input[type="email"],
+select {
   width: 100%;
   padding: 10px;
   margin-bottom: 15px;
@@ -22,7 +21,7 @@ input[type="text"], input[type="password"], input[type="email"], select {
   border-radius: 5px;
 }
 button {
-  padding: 10px;
+  padding: 6px 12px;
   background-color: black;
   color: white;
   border: none;
@@ -36,6 +35,166 @@ a {
   color: #9A9A9A;
   text-decoration: none;
 }
+
+/* ================= */
+/* HOME 페이지 스타일 */
+/* ================= */
+header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 15px 40px;
+  border-bottom: 1px solid #ccc;
+}
+.nav-links {
+  display: flex;
+  gap: 20px;
+}
+.nav-links a {
+  text-decoration: none;
+  color: black;
+  font-weight: bold;
+  font-size: 18px;
+  gap: 15px;
+}
+.search-box {
+  display: flex;
+  align-items: center;
+   gap: 10px; /
+}
+#welcomeText {
+  font-size: 14px;
+  color: black;
+  white-space: nowrap;
+  font-weight: bold;
+}
+.search-box input {
+  padding: 5px 10px;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  width: 180px; 
+}
+.category-button {
+  margin: 20px 40px;
+  padding: 5px 10px;
+  border-radius: 4px;
+  background-color: #6366f1;
+  color: white;
+  border: none;
+  cursor: pointer;
+}
+.news-text {
+  flex-grow: 1;
+}
+.news-container {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 20px;
+  padding: 20px;
+  justify-content: space-between;
+}
+
+.news-card {
+  width: 260px; /* ✅ 고정 크기 */
+  height: 200px; /* 필요 시 높이도 고정 */
+  display: flex;
+  flex-direction: column;
+  padding: 16px;
+  margin: 10px;
+  border: 1px solid #ddd;
+  border-radius: 10px;
+  background-color: #f9f9f9;
+  text-decoration: none;
+  color: black;
+  transition: background-color 0.3s;
+}
+
+
+.news-card:hover {
+  transform: translateY(-5px);
+}
+
+.news-card img {
+  width: 100%;
+  height: 130px;
+  object-fit: cover;
+}
+
+.news-title {
+  font-size: 14px;
+  font-weight: bold;
+  line-height: 1.4;
+  padding-top: 8px;
+
+  white-space: normal;       /* ✅ 줄바꿈 허용 */
+  overflow: hidden;
+  text-overflow: ellipsis;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;      /* ✅ 최대 2줄까지 표시 */
+  line-clamp: 2;              /* ✅ 표준 속성 추가 */
+  -webkit-box-orient: vertical;
+}
+
+.news-content {
+  font-size: 14px;
+  color: #666;
+}
+.news-item {
+  display: flex;
+  align-items: center;
+  margin-bottom: 20px;
+}
+.news-title {
+  font-size: 16px;
+  font-weight: 500;
+}
+.news-thumbnail {
+  width: 160px;
+  height: 100px;
+  border-radius: 6px;
+  object-fit: cover;
+}
+.news-item img {
+  width: 160px;
+  height: 100px;
+  object-fit: cover;
+  margin-right: 15px;
+}
+
+/* ==================== */
+/* 로그인 페이지 스타일 */
+/* ==================== */
+.container {
+  width: 300px;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  margin: auto;
+  padding-top: 15vh;
+}
+.content {
+   max-width: 1200px; /* ✅ 화면이 너무 넓어지지 않도록 제한 */
+  margin: 0 auto;    /* ✅ 좌우 가운데 정렬 */
+  padding: 0 20px;   /* ✅ 좌우 약간의 여백 */
+}
+
+.logo {
+  font-size: 20px;
+}
+.log-btn {
+  width: 100%;
+  padding: 10px;
+  background-color: #000000;
+  color: white;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+}
+
+
+/* ====================== */
+/* 회원가입 페이지 스타일 */
+/* ====================== */
 .signup-layout {
   display: flex;
   align-items: flex-start;
@@ -44,25 +203,23 @@ a {
 .news-logo {
   width: 470px;
   height: 470px;
-    transform: translateY(20%) translateX(-20%);
-    margin-left: 20px;
+  transform: translateY(20%) translateX(-20%);
+  margin-left: 20px;
   object-fit: contain;
 }
 label {
   display: block;
   margin-bottom: 5px;
   font-size: 13px;
-
 }
 .id-wrapper {
   position: relative;
   width: 100%;
   margin-bottom: 15px;
 }
-
 .id-wrapper input[type="text"] {
   width: 100%;
-  padding-right: 90px; /* 버튼 공간 확보 */
+  padding-right: 90px;
   padding: 10px;
   box-sizing: border-box;
 }
@@ -79,15 +236,38 @@ label {
   cursor: pointer;
   color: #333;
 }
+.label-row {
+  display: flex;
+  align-items: center;
+  gap: 10px; /* 간격 조절 */
+  margin-bottom: 5px; /* 아래 입력창과 간격 */
+}
+.label-row .message {
+  margin: 0;
+  font-size: 13px;
+}
 
-/* 선택된 카테고리 태그 스타일 */
+.message {
+  font-size: 0.8em;
+  margin-top: 0;
+  margin-bottom: 20px;
+  line-height: 1.2;
+}
+
+.message.success {
+  color: green;
+}
+
+.message.error {
+  color: red;
+}
+
 .category-tags {
   display: flex;
   flex-wrap: wrap;
   gap: 5px;
   margin-bottom: 10px;
 }
-
 .category-tag {
   background-color: #d9d9d9;
   padding: 1px 10px;
@@ -96,7 +276,31 @@ label {
   display: flex;
   align-items: center;
 }
-
+.category-button {
+  background-color: #000000;
+  color: white;
+  padding: 10px 20px;
+  border-radius: 6px;
+  font-weight: bold;
+  border: none;
+  cursor: pointer;
+}
+#categorySelect {
+  margin-top: 6px;
+  padding: 10px;
+  border-radius: 6px;
+  border: 1px solid #ccc;
+  width: 100%; /* 부모(category-filter)의 너비를 따라감 (버튼과 동일) */
+  box-sizing: border-box;
+  font-size: 14px;
+}
+.category-wrapper {
+   display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  position: relative;
+  margin-left: 20px;
+}
 .category-tag .remove-btn {
   background: none;
   border: none;
@@ -105,17 +309,6 @@ label {
   font-weight: bold;
   font-size: 14px;
 }
-
-.log-btn {
-  width: 100%;
-  padding: 10px;
-  background-color: #000000;
-  color: white;
-  border: none;
-  border-radius: 5px;
-  cursor: pointer;
-}
-/* 가입 버튼 */
 .submit-btn {
   width: 100%;
   padding: 10px;
@@ -128,9 +321,76 @@ label {
 }
 .agreement {
   font-size: 12px;
-  display: flex; /* block 대신 flex로 변경 */
-  align-items: center; /* 수직 가운데 정렬 */
-  gap: 5px; /* 체크박스와 텍스트 사이 여백 */
+  display: flex;
+  align-items: center;
+  gap: 5px;
   margin-bottom: 15px;
+}
+
+/* ====================== */
+/* Hot 토픽픽 스타일 */
+/* ====================== */
+.briefing-container {
+  max-width: 600px;
+  margin: 0 auto;
+  text-align: center;
+}
+
+.carousel {
+  position: relative;
+}
+
+.navigation-buttons {
+  margin-top: 10px;
+}
+
+.navigation-buttons button {
+  font-size: 24px;
+  padding: 8px 12px;
+  margin: 0 10px;
+  border: none;
+  background-color: #eee;
+  cursor: pointer;
+  border-radius: 8px;
+}
+.header-row {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 10px;
+}
+
+.back-button {
+  background: none;
+  border: none;
+  font-size: 24px;
+  cursor: pointer;
+}
+
+.progress-indicator {
+  display: flex;
+  justify-content: center;
+  margin: 10px 0;
+  gap: 8px;
+}
+
+.dot {
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  background-color: lightgray;
+}
+
+.dot.active {
+  background-color: #555;
+}
+.detail-btn {
+  display: inline-block;
+  margin-top: 10px;
+  padding: 8px 16px;
+  background-color: #ff7f2a;
+  color: white;
+  text-decoration: none;
+  border-radius: 6px;
 }
 

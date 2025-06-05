@@ -14,17 +14,22 @@ document.getElementById("loginForm").addEventListener("submit", function(e) {
       password: password
     })
   })
-  .then(res => {
-    if (!res.ok) throw new Error("로그인 실패: 상태 코드 " + res.status);
-    return res.text(); // 또는 .json() 백엔드가 어떻게 응답하느냐에 따라
+  .then(async res => {
+    const text = await res.text(); // 백엔드에서 응답으로 주는 메시지를 읽음
+    if (!res.ok) {
+      throw new Error(text);  // 구체적인 에러 메시지 전파
+    }
+    return text;
   })
   .then(msg => {
-    alert("로그인 성공! 응답: " + msg);
-    // 예: 토큰 저장 후 메인 페이지로 이동
-    // localStorage.setItem("token", msg);  // JWT일 경우
-    // window.location.href = "main.html";
+     // ✅ 로그인 성공 시 상태 저장
+    localStorage.setItem('isLoggedIn', 'true');
+    localStorage.setItem('userId', userId);
+    alert("✅ 로그인 성공!");
+    // ✅ 로그인 성공 시 Home.html로 이동
+    window.location.href = "Home.html";
   })
   .catch(err => {
-    alert("에러 발생: " + err.message);
+    alert("❌ 로그인 실패: " + err.message);
   });
 });
