@@ -8,4 +8,5 @@ import lombok.Getter;
 public class CardDto {
     private String newsId;
     private String title;
+    private String imageUrl;
 }

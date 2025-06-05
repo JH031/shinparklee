@@ -12,5 +12,6 @@ public class ScrapSummaryDto {
     private Long id;
     private String title;
     private String url;
+    private String imageUrl;
     private List<StyleSummaryDto> summaries;
 }

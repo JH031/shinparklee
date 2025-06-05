@@ -89,7 +89,7 @@ public class NewsController {
                 : newsService.getNewsByCategory(category); // 수정된 메서드 사용
 
         List<CardDto> cards = newsList.stream()
-                .map(news -> new CardDto(news.getNewsId(), news.getTitle()))
+                .map(news -> new CardDto(news.getNewsId(), news.getTitle(), news.getImageUrl()))
                 .toList();
 
         return ResponseEntity.ok(cards);

@@ -56,11 +56,12 @@ public class SummaryController {
 
                     return new SummaryNewsDto(
                             summary.getNews().getId(),
-                            summary.getNews().getNewsId(),         // id
-                            summary.getNews().getTitle(),          // title
-                            summary.getNews().getUrl(),            // url
-                            null,                                  // createdAt → null로 명시
-                            map                                    // summaries
+                            summary.getNews().getNewsId(),
+                            summary.getNews().getTitle(),
+                            summary.getNews().getUrl(),
+                            summary.getNews().getImageUrl(),
+                            null,
+                            map
                     );
 
                 })
@@ -84,9 +85,11 @@ public class SummaryController {
                             summary.getNews().getNewsId(),
                             summary.getNews().getTitle(),
                             summary.getNews().getUrl(),
+                            summary.getNews().getImageUrl(),
                             null,
                             map
                     );
+
                 })
                 .toList();
         return ResponseEntity.ok(result);

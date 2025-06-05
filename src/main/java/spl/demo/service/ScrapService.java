@@ -68,8 +68,10 @@ public class ScrapService {
                     news.getId(),
                     news.getTitle(),
                     news.getUrl(),
+                    news.getImageUrl(),
                     defaultOnly
             );
+
         }).collect(Collectors.toList());
     }
 
