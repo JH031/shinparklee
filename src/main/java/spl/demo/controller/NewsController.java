@@ -3,12 +3,14 @@ package spl.demo.controller;
 import io.swagger.v3.oas.annotations.Operation;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 import spl.demo.crawler.NaverNewsCrawler;
 import spl.demo.dto.CardDto;
 import spl.demo.dto.SummaryNewsDto;
 import spl.demo.entity.InterestCategoryEntity;
 import spl.demo.entity.NewsEntity;
+import spl.demo.security.CustomUserDetails;
 import spl.demo.service.NewsService;
 
 import java.util.List;
@@ -101,6 +103,15 @@ public class NewsController {
     public ResponseEntity<List<SummaryNewsDto>> searchNewsByTitle(@RequestParam("keyword") String keyword) {
         List<SummaryNewsDto> result = newsService.searchNewsDtoByTitle(keyword);
         return ResponseEntity.ok(result);
+    }
+    @GetMapping("/with-scrap")
+    @Operation(summary = "스크랩 여부 포함 전체 뉴스 조회")
+    public ResponseEntity<?> getAllNewsWithScrapStatus(@AuthenticationPrincipal CustomUserDetails userDetails) {
+        if (userDetails == null) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("로그인이 필요합니다.");
+        }
+
+        return ResponseEntity.ok(newsService.getAllNewsWithScrapStatus(userDetails.getUser().getId()));
     }
 
 }

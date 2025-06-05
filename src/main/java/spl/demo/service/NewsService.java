@@ -16,6 +16,8 @@ import java.time.LocalDateTime;
 import java.util.*;
 import java.util.function.Supplier;
 import java.util.stream.Collectors;
+import spl.demo.repository.SignupRepository;
+import spl.demo.repository.ScrapRepository;
 
 @Service
 @RequiredArgsConstructor
@@ -25,6 +27,9 @@ public class NewsService {
     private final SummaryRepository summaryRepository;
     private final StyleSummaryRepository styleSummaryRepository;
     private final GeminiService geminiService;
+    private final SignupRepository signupRepository;
+    private final ScrapRepository scrapRepository;
+
 
     // 뉴스 저장 (중복 방지 + 큰따옴표 제거)
     public void saveNewsIfNotExists(NewsDto dto) {
@@ -190,5 +195,23 @@ public class NewsService {
                         .summaries(null)
                         .build())
                 .toList();
+    }
+
+    // ✅ 사용자 기준 스크랩 여부 포함 뉴스 목록
+    public List<NewsDto> getAllNewsWithScrapStatus(Long userId) {
+        SignupEntity user = signupRepository.findById(userId)
+                .orElseThrow(() -> new RuntimeException("사용자 없음"));
+
+        List<NewsEntity> allNews = newsRepository.findAll();
+        List<ScrapEntity> userScraps = scrapRepository.findByUser(user);
+
+        Set<Long> scrappedNewsIds = userScraps.stream()
+                .map(scrap -> scrap.getNews().getId())
+                .collect(Collectors.toSet());
+
+        return allNews.stream()
+                .map(news -> new NewsDto(
+                ))
+                .collect(Collectors.toList());
     }
 }

@@ -11,4 +11,5 @@ public class NewsDto {
     private String content;
     private String imageUrl;
     private InterestCategoryEntity category;
+    private boolean isScrapped;
 }
