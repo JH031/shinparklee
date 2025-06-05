@@ -1,8 +1,10 @@
 package spl.demo.service;
 
+import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import spl.demo.dto.UserInfoDto;
+import spl.demo.dto.UserUpdateRequestDto;
 import spl.demo.entity.SignupEntity;
 import spl.demo.repository.SignupRepository;
 
@@ -24,5 +26,19 @@ public class UserService {
                 user.getStyle()
         );
     }
+    @Transactional
+    public void updateUserInfo(String currentUserId, UserUpdateRequestDto dto) {
+        SignupEntity user = signupRepository.findByUserId(currentUserId)
+                .orElseThrow(() -> new IllegalArgumentException("해당 사용자가 존재하지 않습니다."));
+
+        if (dto.getInterestCategories() != null) {
+            user.setInterestCategories(dto.getInterestCategories());
+        }
+
+        if (dto.getStyle() != null) {
+            user.setStyle(dto.getStyle());
+        }
+    }
+
 
 }

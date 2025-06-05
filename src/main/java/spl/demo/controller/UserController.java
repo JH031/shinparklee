@@ -6,6 +6,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 import spl.demo.dto.UserInfoDto;
+import spl.demo.dto.UserUpdateRequestDto;
 import spl.demo.security.CustomUserDetails;
 import spl.demo.service.UserService;
 
@@ -22,4 +23,15 @@ public class UserController {
         String userId = userDetails.getUsername(); // == user.getUserId()
         return ResponseEntity.ok(userService.getUserInfoByUserId(userId));
     }
+
+    @PutMapping("/me")
+    @Operation(summary = "유저 정보 수정")
+    public ResponseEntity<String> updateUserInfo(
+            @AuthenticationPrincipal CustomUserDetails userDetails,
+            @RequestBody UserUpdateRequestDto dto
+    ) {
+        userService.updateUserInfo(userDetails.getUsername(), dto); // 또는 getUserId() 사용
+        return ResponseEntity.ok("회원 정보가 수정되었습니다.");
+    }
+
 }
