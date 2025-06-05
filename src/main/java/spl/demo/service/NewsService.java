@@ -83,8 +83,7 @@ public class NewsService {
                     }
                 }
 
-                // ✅ 딜레이 4.5초
-                Thread.sleep(4500);
+                Thread.sleep(5000);
 
             } catch (InterruptedException ie) {
                 Thread.currentThread().interrupt();
