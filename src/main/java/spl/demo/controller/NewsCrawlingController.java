@@ -19,7 +19,7 @@ public class NewsCrawlingController {
     @PostMapping("/hot-news")
     public String crawlHotNews() {
         HotTopicCrawler.crawlYonhapHotTopics(newsService);  // ✅ HotNewsService 제거됨
-        return "✅ 연합뉴스 핫토픽 크롤링 완료";
+        return "✅ 핫토픽 크롤링 완료";
     }
 }
 
