@@ -5,6 +5,8 @@ import lombok.Getter;
 import lombok.Setter;
 
 import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.List;
 
 @Setter
 @Getter
@@ -57,6 +59,9 @@ public class NewsEntity {
             this.createdAt = LocalDateTime.now();
         }
     }
+
+    @OneToMany(mappedBy = "news", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    private List<StyleSummaryEntity> styleSummaries = new ArrayList<>();
 
     // 기본 생성자
     public NewsEntity() {}

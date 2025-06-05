@@ -3,13 +3,12 @@ package spl.demo.service;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import spl.demo.dto.ScrapSummaryDto;
+import spl.demo.dto.StyleSummaryDto;
 import spl.demo.entity.*;
 import spl.demo.repository.*;
 
-import java.util.EnumMap;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -55,23 +54,36 @@ public class ScrapService {
         return scraps.stream().map(scrap -> {
             NewsEntity news = scrap.getNews();
 
-            // 기본 요약문
+            // 기본 요약만 조회
             String defaultSummary = summaryRepository.findByNews(news)
                     .map(SummaryEntity::getSummaryText)
                     .orElse("요약문 없음");
 
-            // 말투 요약문
-            EnumMap<SummaryStyle, String> summaries = new EnumMap<>(SummaryStyle.class);
-            summaries.put(SummaryStyle.DEFAULT, defaultSummary);
+            // 오직 DEFAULT만 담음
+            List<StyleSummaryDto> defaultOnly = List.of(
+                    new StyleSummaryDto(news.getId(), SummaryStyle.DEFAULT, defaultSummary)
+            );
 
-            for (SummaryStyle style : SummaryStyle.values()) {
-                if (style == SummaryStyle.DEFAULT) continue;
+            return new ScrapSummaryDto(
+                    news.getId(),
+                    news.getTitle(),
+                    news.getUrl(),
+                    defaultOnly
+            );
+        }).collect(Collectors.toList());
+    }
 
-                styleSummaryRepository.findByNews_IdAndStyle(news.getId(), style);
-            }
+    // ✅ 스타일 요약만 따로 반환 (별도 API 용)
+    public List<StyleSummaryDto> getStyleSummariesOnly(Long userId) {
+        SignupEntity user = signupRepository.findById(userId)
+                .orElseThrow(() -> new RuntimeException("사용자 없음"));
 
-            return new ScrapSummaryDto(news.getId(), news.getTitle(), news.getUrl(), summaries);
-        }).toList();
+        List<ScrapEntity> scraps = scrapRepository.findByUser(user);
+
+        return scraps.stream()
+                .flatMap(scrap -> scrap.getNews().getStyleSummaries().stream()
+                        .map(s -> new StyleSummaryDto(scrap.getNews().getId(), s.getStyle(), s.getSummaryText())))
+                .collect(Collectors.toList());
     }
 
     public List<NewsEntity> getScrappedNews(Long userId) {
@@ -83,4 +95,3 @@ public class ScrapService {
                 .toList();
     }
 }
-

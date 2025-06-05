@@ -9,7 +9,7 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @Table(
         name = "style_summary",
-        uniqueConstraints = @UniqueConstraint(columnNames = {"news_id", "style"}) // ✅ 추가
+        uniqueConstraints = @UniqueConstraint(columnNames = {"news_id", "style"}) // ✅ 중복 방지
 )
 public class StyleSummaryEntity {
 
