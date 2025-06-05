@@ -5,6 +5,7 @@ import spl.demo.entity.InterestCategoryEntity;
 import spl.demo.entity.NewsEntity;
 
 import java.util.List;
+import java.util.Optional;
 
 public interface NewsRepository extends JpaRepository<NewsEntity, Long> {
 
@@ -17,4 +18,6 @@ public interface NewsRepository extends JpaRepository<NewsEntity, Long> {
     List<NewsEntity> findByHotTopicTrue();
 
     List<NewsEntity> findByTitleContainingIgnoreCase(String keyword);
+
+    Optional<NewsEntity> findByNewsId(String newsId);
 }

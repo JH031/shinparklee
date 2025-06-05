@@ -15,9 +15,13 @@ public class CustomUserDetails implements UserDetails {
         this.user = user;
     }
 
+    // ✅ getUser() 메서드 추가!
+    public SignupEntity getUser() {
+        return user;
+    }
+
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
-        // 현재 권한(role)을 사용하지 않으므로 빈 리스트 반환
         return Collections.emptyList();
     }
 
@@ -28,27 +32,11 @@ public class CustomUserDetails implements UserDetails {
 
     @Override
     public String getUsername() {
-        // 로그인 시 사용할 userId 반환 (username 아님에 주의)
         return user.getUserId();
     }
 
-    @Override
-    public boolean isAccountNonExpired() {
-        return true;
-    }
-
-    @Override
-    public boolean isAccountNonLocked() {
-        return true;
-    }
-
-    @Override
-    public boolean isCredentialsNonExpired() {
-        return true;
-    }
-
-    @Override
-    public boolean isEnabled() {
-        return true;
-    }
+    @Override public boolean isAccountNonExpired() { return true; }
+    @Override public boolean isAccountNonLocked() { return true; }
+    @Override public boolean isCredentialsNonExpired() { return true; }
+    @Override public boolean isEnabled() { return true; }
 }

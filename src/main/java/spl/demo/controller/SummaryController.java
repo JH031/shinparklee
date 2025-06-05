@@ -46,7 +46,7 @@ public class SummaryController {
 
     // 기본 요약 조회 (newsId + title + 요약)
     @GetMapping("/basic")
-    @Operation(summary = "기본 요약 - 제목,요약,id 조회")
+    @Operation(summary = "기본 요약 - 제목, 요약, id 조회")
     public ResponseEntity<List<SummaryNewsDto>> getAllBasicSummaries() {
         List<SummaryEntity> summaries = summaryRepository.findAll();
         List<SummaryNewsDto> result = summaries.stream()
@@ -55,20 +55,23 @@ public class SummaryController {
                     map.put(SummaryStyle.DEFAULT, summary.getSummaryText());
 
                     return new SummaryNewsDto(
-                            summary.getNews().getNewsId(),
-                            summary.getNews().getTitle(),
-                            null,
-                            null,
-                            map
+                            summary.getNews().getId(),
+                            summary.getNews().getNewsId(),         // id
+                            summary.getNews().getTitle(),          // title
+                            summary.getNews().getUrl(),            // url
+                            null,                                  // createdAt → null로 명시
+                            map                                    // summaries
                     );
+
                 })
                 .toList();
         return ResponseEntity.ok(result);
     }
 
+
     //  스타일 요약 조회 (newsId + title + 스타일 요약)
     @GetMapping("/style")
-    @Operation(summary = "스타일 요약 -  제목,요약,id 조회")
+    @Operation(summary = "스타일 요약 - 제목, 요약, id 조회")
     public ResponseEntity<List<SummaryNewsDto>> getAllStyleSummaries(@RequestParam("style") SummaryStyle style) {
         List<StyleSummaryEntity> summaries = styleSummaryRepository.findByStyle(style);
         List<SummaryNewsDto> result = summaries.stream()
@@ -77,9 +80,10 @@ public class SummaryController {
                     map.put(style, summary.getSummaryText());
 
                     return new SummaryNewsDto(
+                            summary.getNews().getId(),
                             summary.getNews().getNewsId(),
                             summary.getNews().getTitle(),
-                            null,
+                            summary.getNews().getUrl(),
                             null,
                             map
                     );

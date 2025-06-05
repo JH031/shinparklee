@@ -6,19 +6,12 @@ import org.springframework.transaction.annotation.Transactional;
 import spl.demo.dto.CardDto;
 import spl.demo.dto.NewsDto;
 import spl.demo.dto.SummaryNewsDto;
-import spl.demo.entity.InterestCategoryEntity;
-import spl.demo.entity.NewsEntity;
-import spl.demo.entity.StyleSummaryEntity;
-import spl.demo.entity.SummaryEntity;
-import spl.demo.entity.SummaryStyle;
+import spl.demo.entity.*;
 import spl.demo.repository.NewsRepository;
 import spl.demo.repository.StyleSummaryRepository;
 import spl.demo.repository.SummaryRepository;
 
-import java.util.EnumMap;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.stream.Collectors;
 
 @Service
@@ -38,7 +31,6 @@ public class NewsService {
             newsEntity.setTitle(dto.getTitle());
             newsEntity.setUrl(dto.getUrl());
 
-            // 큰따옴표 제거
             String cleanedContent = dto.getContent().replace("\"", "");
             newsEntity.setContent(cleanedContent);
 
@@ -48,11 +40,12 @@ public class NewsService {
         }
     }
 
-    // ✅ 전체 뉴스 조회
+    // 전체 뉴스 조회
     public List<NewsEntity> getAllNews() {
         return newsRepository.findAll();
     }
 
+    // 카테고리별 카드 뉴스 조회
     public List<CardDto> getCardNewsByCategory(InterestCategoryEntity category) {
         List<NewsEntity> newsList = (category == null)
                 ? newsRepository.findAll()
@@ -63,22 +56,21 @@ public class NewsService {
                 .toList();
     }
 
-
-    // ✅ Gemini를 활용한 뉴스 요약 → 기본 요약 + 말투 요약 모두 저장
+    // Gemini 기반 전체 요약 생성 (기본 + 스타일 요약)
     @Transactional
     public void summarizeAllNews() {
         List<NewsEntity> newsList = newsRepository.findAll();
 
         for (NewsEntity news : newsList) {
             try {
-                // 기본 요약 저장
+                // 기본 요약
                 if (!summaryRepository.existsByNews(news)) {
                     String summaryText = geminiService.summarizeTo4Lines(news.getContent());
                     SummaryEntity summary = new SummaryEntity(news, summaryText);
                     summaryRepository.save(summary);
                 }
 
-                // 말투 요약 저장
+                // 스타일 요약
                 for (SummaryStyle style : SummaryStyle.values()) {
                     if (style == SummaryStyle.DEFAULT) continue;
 
@@ -90,7 +82,7 @@ public class NewsService {
                     }
                 }
 
-                Thread.sleep(5000);
+                Thread.sleep(5000); // 요약 지연 방지용
 
             } catch (InterruptedException ie) {
                 Thread.currentThread().interrupt();
@@ -102,6 +94,7 @@ public class NewsService {
         }
     }
 
+    // 핫토픽 뉴스 저장
     public void saveHotTopicIfNotExists(NewsDto dto) {
         if (!newsRepository.existsByNewsId(dto.getNewsId())) {
             NewsEntity newsEntity = new NewsEntity();
@@ -109,29 +102,28 @@ public class NewsService {
             newsEntity.setTitle(dto.getTitle());
             newsEntity.setUrl(dto.getUrl());
             newsEntity.setContent(dto.getContent().replace("\"", ""));
-            newsEntity.setCategory(InterestCategoryEntity.HOT_TOPIC);      // 핫토픽은 카테고리 없이
-            newsEntity.setHotTopic(true);       // ✅ 핫토픽 표시
+            newsEntity.setCategory(InterestCategoryEntity.HOT_TOPIC);
+            newsEntity.setHotTopic(true);
 
             newsRepository.save(newsEntity);
         }
     }
+
+    // 핫토픽 뉴스 요약 리스트 반환
     public List<SummaryNewsDto> getHotTopicSummariesWithAllStyles() {
         List<NewsEntity> hotNewsList = newsRepository.findByHotTopicTrue();
 
         List<SummaryEntity> baseSummaries = summaryRepository.findByNewsIn(hotNewsList);
         List<StyleSummaryEntity> styleSummaries = styleSummaryRepository.findByNewsIn(hotNewsList);
 
-        // 요약을 뉴스 ID 기준으로 매핑
         Map<Long, EnumMap<SummaryStyle, String>> summaryMap = new HashMap<>();
 
-        // 기본 요약 넣기
         for (SummaryEntity base : baseSummaries) {
             summaryMap
                     .computeIfAbsent(base.getNews().getId(), k -> new EnumMap<>(SummaryStyle.class))
                     .put(SummaryStyle.DEFAULT, base.getSummaryText());
         }
 
-        // 스타일 요약 넣기
         for (StyleSummaryEntity style : styleSummaries) {
             summaryMap
                     .computeIfAbsent(style.getNews().getId(), k -> new EnumMap<>(SummaryStyle.class))
@@ -141,7 +133,7 @@ public class NewsService {
         return hotNewsList.stream()
                 .filter(news -> summaryMap.containsKey(news.getId()))
                 .map(news -> SummaryNewsDto.builder()
-                        .newsId(news.getNewsId())
+                        .id(news.getId())  // ✅ DB PK 기준으로 변경됨
                         .title(news.getTitle())
                         .url(news.getUrl())
                         .createdAt(news.getCreatedAt())
@@ -151,19 +143,18 @@ public class NewsService {
                 .collect(Collectors.toList());
     }
 
+    // 뉴스 제목 검색
     public List<SummaryNewsDto> searchNewsDtoByTitle(String keyword) {
         List<NewsEntity> newsList = newsRepository.findByTitleContainingIgnoreCase(keyword);
 
         return newsList.stream()
                 .map(news -> SummaryNewsDto.builder()
-                        .newsId(news.getNewsId())
+                        .id(news.getId())  // ✅ 변경됨
                         .title(news.getTitle())
                         .url(news.getUrl())
                         .createdAt(news.getCreatedAt())
-                        .summaries(null)  // 요약 없이 검색 결과만 반환
+                        .summaries(null)
                         .build())
                 .toList();
     }
-
-
 }
