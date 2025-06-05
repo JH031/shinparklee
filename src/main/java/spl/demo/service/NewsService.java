@@ -171,6 +171,7 @@ public class NewsService {
                 .filter(news -> summaryMap.containsKey(news.getId()))
                 .map(news -> SummaryNewsDto.builder()
                         .id(news.getId())
+                        .newsId(news.getNewsId())
                         .title(news.getTitle())
                         .url(news.getUrl())
                         .createdAt(news.getCreatedAt())
