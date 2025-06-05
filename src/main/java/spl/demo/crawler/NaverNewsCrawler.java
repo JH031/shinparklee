@@ -14,34 +14,54 @@ public class NaverNewsCrawler {
         try {
             String url = "https://news.naver.com/main/main.naver?mode=LSD&mid=shm&sid1=" + sid;
             System.out.println("🧭 크롤링 시작: " + url);
-            Document doc = Jsoup.connect(url).get();
 
-            Elements headlineLinks = doc.select("a[href^=https://n.news.naver.com/mnews/article/]");
+            Document doc = Jsoup.connect(url)
+                    .userAgent("Mozilla/5.0")
+                    .get();
+
+            Elements headlineLinks = doc.select("a.sa_text_title[href^=https://n.news.naver.com/mnews/article/]");
 
             int savedCount = 0;
-            int limit = 10; // ✅ 최대 10개로 제한
+            int limit = 6;
 
             for (Element linkEl : headlineLinks) {
-                if (savedCount >= limit) break; // ✅ 10개 저장되면 종료
+                if (savedCount >= limit) break;
 
                 String link = linkEl.attr("href");
-
-                // newsId 생성: article/언론사ID/기사ID
                 String[] parts = link.split("/");
+
                 if (parts.length < 7) {
                     System.out.println("❌ 잘못된 링크 구조: " + link);
                     continue;
                 }
+
                 String pressId = parts[5];
                 String articleId = parts[6].split("\\?")[0];
                 String newsId = pressId + "_" + articleId;
 
-                // 상세 페이지에서 본문 가져오기
-                Document detailDoc = Jsoup.connect(link).get();
-                Element contentEl = detailDoc.selectFirst("#dic_area");
-                Element titleEl = detailDoc.selectFirst("h2#title_area");
+                Document detailDoc = Jsoup.connect(link)
+                        .userAgent("Mozilla/5.0")
+                        .get();
 
-                if (contentEl == null || titleEl == null) {
+                Element titleEl = detailDoc.selectFirst("h2#title_area, h2.media_end_head_headline");
+                Element contentEl = detailDoc.selectFirst("#dic_area, #newsct_article");
+                Element imageEl = detailDoc.selectFirst("div#newsct_article img, div.article_body img, figure img");
+
+                String imageUrl = null;
+                if (imageEl != null) {
+                    imageUrl = imageEl.hasAttr("src") ? imageEl.attr("src") : imageEl.attr("data-src");
+
+                    if (imageUrl != null && imageUrl.startsWith("//")) {
+                        imageUrl = "https:" + imageUrl;
+                    }
+                }
+
+                if (imageUrl == null || imageUrl.isBlank()) {
+                    System.out.println("🚫 이미지 없음 → 제외: " + link);
+                    continue;
+                }
+
+                if (titleEl == null || contentEl == null) {
                     System.out.println("❌ 본문 또는 제목 없음: " + link);
                     continue;
                 }
@@ -51,10 +71,13 @@ public class NaverNewsCrawler {
                 dto.setTitle(titleEl.text());
                 dto.setUrl(link);
                 dto.setContent(contentEl.text());
+                dto.setImageUrl(imageUrl);
                 dto.setCategory(category);
 
                 newsService.saveNewsIfNotExists(dto);
                 System.out.println("✅ 저장 성공: " + dto.getTitle());
+                System.out.println("📷 이미지 URL: " + imageUrl);
+
                 savedCount++;
             }
 

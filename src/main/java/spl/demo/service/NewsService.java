@@ -43,6 +43,7 @@ public class NewsService {
             newsEntity.setContent(cleanedContent);
 
             newsEntity.setCategory(dto.getCategory());
+            newsEntity.setImageUrl(dto.getImageUrl());
 
             newsRepository.save(newsEntity);
         }

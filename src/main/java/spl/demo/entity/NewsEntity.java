@@ -34,6 +34,10 @@ public class NewsEntity {
     private String content; // 뉴스 본문
 
     @Setter
+    @Column(name = "image_url") // ✅ 이미지 URL 컬럼 추가
+    private String imageUrl;
+
+    @Setter
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)
     private InterestCategoryEntity category; // 뉴스 카테고리 (enum)
