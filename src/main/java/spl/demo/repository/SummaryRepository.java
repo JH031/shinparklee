@@ -11,6 +11,7 @@ import java.util.Optional;
 
 public interface SummaryRepository extends JpaRepository<SummaryEntity, Long> {
     boolean existsByNews(NewsEntity news);
+    Optional<SummaryEntity> findByNews(NewsEntity news);
     @Query("SELECT s FROM SummaryEntity s WHERE s.news.hotTopic = true")
     List<SummaryEntity> findByNewsIn(List<NewsEntity> newsList);
 
