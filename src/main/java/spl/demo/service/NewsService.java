@@ -169,6 +169,7 @@ public class NewsService {
                         .title(news.getTitle())
                         .url(news.getUrl())
                         .createdAt(news.getCreatedAt())
+                        .imageUrl(news.getImageUrl())
                         .summaries(summaryMap.get(news.getId()))
                         .build()
                 )
