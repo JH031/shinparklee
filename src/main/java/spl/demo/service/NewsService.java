@@ -64,14 +64,14 @@ public class NewsService {
 
         for (NewsEntity news : newsList) {
             try {
-                //  기본 요약 저장
+                // 기본 요약 저장
                 if (!summaryRepository.existsByNews(news)) {
                     String summaryText = geminiService.summarizeTo4Lines(news.getContent());
                     SummaryEntity summary = new SummaryEntity(news, summaryText);
                     summaryRepository.save(summary);
                 }
 
-                //  말투 요약 저장 (모든 말투)
+                // 말투 요약 저장
                 for (SummaryStyle style : SummaryStyle.values()) {
                     if (style == SummaryStyle.DEFAULT) continue;
 
@@ -83,12 +83,19 @@ public class NewsService {
                     }
                 }
 
+                // ✅ 딜레이 4.5초
+                Thread.sleep(4500);
+
+            } catch (InterruptedException ie) {
+                Thread.currentThread().interrupt();
+                System.err.println("요약 작업이 인터럽트됨: " + news.getId());
             } catch (Exception e) {
                 System.err.println("❌ 요약 실패 - 뉴스 ID: " + news.getId());
                 e.printStackTrace();
             }
         }
     }
+
     public void saveHotTopicIfNotExists(NewsDto dto) {
         if (!newsRepository.existsByNewsId(dto.getNewsId())) {
             NewsEntity newsEntity = new NewsEntity();
