@@ -87,4 +87,5 @@ public class SummaryController {
                 .toList();
         return ResponseEntity.ok(result);
     }
+
 }

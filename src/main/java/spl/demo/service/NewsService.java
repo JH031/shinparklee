@@ -144,5 +144,19 @@ public class NewsService {
                 .collect(Collectors.toList());
     }
 
+    public List<SummaryNewsDto> searchNewsDtoByTitle(String keyword) {
+        List<NewsEntity> newsList = newsRepository.findByTitleContainingIgnoreCase(keyword);
+
+        return newsList.stream()
+                .map(news -> SummaryNewsDto.builder()
+                        .newsId(news.getNewsId())
+                        .title(news.getTitle())
+                        .url(news.getUrl())
+                        .createdAt(news.getCreatedAt())
+                        .summaries(null)  // 요약 없이 검색 결과만 반환
+                        .build())
+                .toList();
+    }
+
 
 }

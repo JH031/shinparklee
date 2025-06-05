@@ -15,4 +15,6 @@ public interface NewsRepository extends JpaRepository<NewsEntity, Long> {
     List<NewsEntity> findByCategory(InterestCategoryEntity category);
 
     List<NewsEntity> findByHotTopicTrue();
+
+    List<NewsEntity> findByTitleContainingIgnoreCase(String keyword);
 }

@@ -6,6 +6,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import spl.demo.crawler.NaverNewsCrawler;
 import spl.demo.dto.CardDto;
+import spl.demo.dto.SummaryNewsDto;
 import spl.demo.entity.InterestCategoryEntity;
 import spl.demo.entity.NewsEntity;
 import spl.demo.service.NewsService;
@@ -89,6 +90,13 @@ public class NewsController {
                 .toList();
 
         return ResponseEntity.ok(cards);
+    }
+
+    @Operation(summary = "뉴스 제목 키워드로 검색")
+    @GetMapping("/search")
+    public ResponseEntity<List<SummaryNewsDto>> searchNewsByTitle(@RequestParam("keyword") String keyword) {
+        List<SummaryNewsDto> result = newsService.searchNewsDtoByTitle(keyword);
+        return ResponseEntity.ok(result);
     }
 
 }
