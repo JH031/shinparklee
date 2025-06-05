@@ -88,5 +88,24 @@ public class ScrapController {
         SignupEntity user = userDetails.getUser();
         return ResponseEntity.ok(scrapService.getStyleSummariesOnly(user.getId()));
     }
+    @GetMapping("/mypage")
+    @Operation(summary = "유저 정보 조회")
+    public ResponseEntity<?> getMyPageInfo(@AuthenticationPrincipal CustomUserDetails userDetails) {
+        if (userDetails == null) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("로그인이 필요합니다.");
+        }
 
+        SignupEntity user = userDetails.getUser();
+        return ResponseEntity.ok(scrapService.getMyPage(user.getId()));
+    }
+    @GetMapping("/mypage/grouped")
+    @Operation(summary = "마이페이지: 카테고리별 스크랩 뉴스 목록")
+    public ResponseEntity<?> getGroupedScraps(@AuthenticationPrincipal CustomUserDetails userDetails) {
+        if (userDetails == null) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("로그인이 필요합니다.");
+        }
+
+        return ResponseEntity.ok(scrapService.getScrapsGroupedByCategory(userDetails.getUser().getId()));
+    }
 }
+
