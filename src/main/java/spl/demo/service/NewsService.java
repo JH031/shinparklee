@@ -60,7 +60,7 @@ public class NewsService {
                 : newsRepository.findByCategory(category);
 
         return newsList.stream()
-                .map(news -> new CardDto(news.getNewsId(), news.getTitle()))
+                .map(news -> new CardDto(news.getNewsId(), news.getTitle(), news.getImageUrl()))
                 .toList();
     }
 

@@ -18,6 +18,7 @@ public class SummaryNewsDto {
     private String newsId;
     private String title;
     private String url;
+    private String imageUrl;
     private LocalDateTime createdAt;
     private EnumMap<SummaryStyle, String> summaries;
 }
