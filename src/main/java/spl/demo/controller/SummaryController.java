@@ -24,9 +24,7 @@ import java.util.List;
 public class SummaryController {
 
     private final NewsService newsService;
-    private final NewsRepository newsRepository;
     private final StyleSummaryRepository styleSummaryRepository;
-    private final GeminiService geminiService;
     private final SummaryRepository summaryRepository;
 
     // 기본 요약 + 스타일 요약 전체 생성
