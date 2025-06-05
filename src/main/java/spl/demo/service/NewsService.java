@@ -11,6 +11,7 @@ import spl.demo.repository.NewsRepository;
 import spl.demo.repository.StyleSummaryRepository;
 import spl.demo.repository.SummaryRepository;
 
+import java.time.LocalDateTime;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -37,6 +38,7 @@ public class NewsService {
 
             newsEntity.setCategory(dto.getCategory());
             newsEntity.setImageUrl(dto.getImageUrl());
+            newsEntity.setCreatedAt(LocalDateTime.now());
 
             newsRepository.save(newsEntity);
         }
@@ -74,6 +76,8 @@ public class NewsService {
             newsEntity.setContent(dto.getContent().replace("\"", ""));
             newsEntity.setCategory(InterestCategoryEntity.HOT_TOPIC);
             newsEntity.setHotTopic(true);
+            newsEntity.setImageUrl(dto.getImageUrl());
+            newsEntity.setCreatedAt(LocalDateTime.now());
 
             newsRepository.save(newsEntity);
         }

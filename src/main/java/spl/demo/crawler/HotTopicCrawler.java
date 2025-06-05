@@ -14,24 +14,36 @@ public class HotTopicCrawler {
 
     public static void crawlYonhapHotTopics(NewsService newsService) {
         try {
-            String url = "https://news.naver.com/main/ranking/popularDay.naver";
+            String url = "https://news.naver.com/main/ranking/popularDay.naver?mid=etc&sid1=111"; // 뉴스홈 기본 랭킹 페이지
 
             Document doc = Jsoup.connect(url)
                     .userAgent("Mozilla/5.0 (Windows NT 10.0; Win64; x64)")
                     .get();
 
-            // “001”(연합뉴스) 기사 링크만 골라내기
-            Elements articleLinks = doc.select("a[href^=https://n.news.naver.com/article/001/]");
-            System.out.println("🔍 전체 연합뉴스 기사 링크 수: " + articleLinks.size());
+            // 한국일보 박스 탐색
+            Element pressBox = doc.selectFirst("a[href*='/press/469/']") // 한국일보 언론사 링크 찾기
+                    .closest("div.rankingnews_box");
+
+            if (pressBox == null) {
+                System.out.println("❌ 한국일보 박스를 찾을 수 없습니다.");
+                return;
+            }
+
+            Elements items = pressBox.select("ul.rankingnews_list > li");
+            System.out.println("📰 한국일보 랭킹 기사 수: " + items.size());
 
             Set<String> seenLinks = new HashSet<>();
             int savedCount = 0;
             int limit = 5;
 
-            for (Element linkEl : articleLinks) {
-                String link = linkEl.absUrl("href");
-                if (!seenLinks.add(link)) continue;  // 중복 제거
+            for (Element item : items) {
                 if (savedCount >= limit) break;
+
+                Element linkEl = item.selectFirst("a.list_title");
+                if (linkEl == null) continue;
+
+                String link = linkEl.absUrl("href");
+                if (!seenLinks.add(link)) continue;
 
                 Document detailDoc = Jsoup.connect(link)
                         .userAgent("Mozilla/5.0 (Windows NT 10.0; Win64; x64)")
@@ -40,50 +52,43 @@ public class HotTopicCrawler {
                 // 제목
                 Element titleEl = detailDoc.selectFirst("h2.media_end_head_headline span");
 
-                // 본문(article#dic_area) 가져오기
+                // 본문 내용
                 Element contentEl = detailDoc.selectFirst("article#dic_area");
                 String contentText = "";
                 if (contentEl != null) {
-                    // 이미지 캡션(span.end_photo_org) 부분 제거
-                    contentEl.select("span.end_photo_org").remove();
+                    contentEl.select("span.end_photo_org").remove();  // 불필요한 캡션 제거
                     contentText = contentEl.text().trim();
                 }
 
-                // 대표 이미지:
-                // 1) 일반적으로 <div class="nbd_im_w"> 안의 <img> 태그
-                // 2) 혹시 구조가 다르면 “newsct_article” 내 모든 img 태그 중 첫 번째
-                Element imageEl = detailDoc.selectFirst("div.nbd_im_w img, div#newsct_article img");
-                String imageUrl = "";
-                if (imageEl != null) {
-                    imageUrl = imageEl.attr("src");
+                Element imageMeta = detailDoc.selectFirst("meta[property=og:image]");
+                String imageUrl = null;
+                if (imageMeta != null) {
+                    imageUrl = imageMeta.attr("content");
                 }
 
-                if (titleEl == null || contentText.isBlank()) {
-                    System.out.println("❌ 제목 또는 본문 없음. 건너뜀: " + link);
+                if (imageUrl == null || imageUrl.trim().isEmpty()) {
+                    System.out.println("🚫 본문 이미지 없음 → 제외: " + link);
                     continue;
                 }
 
                 String newsId = generateNewsId(link);
                 System.out.println("🆔 newsId: " + newsId);
-                System.out.println("📰 제목: " + titleEl.text());
-                System.out.println("📄 본문(앞 30자): " +
-                        (contentText.length() > 30 ? contentText.substring(0, 30) + "..." : contentText));
-                System.out.println("🖼 이미지: " + (imageUrl.isEmpty() ? "(없음)" : imageUrl));
+                System.out.println("📰 제목: " + (titleEl != null ? titleEl.text() : "(제목 없음)"));
+                System.out.println("🖼 이미지: " + imageUrl);
 
                 NewsDto dto = new NewsDto();
                 dto.setNewsId(newsId);
-                dto.setTitle(titleEl.text());
+                dto.setTitle(titleEl != null ? titleEl.text() : "");
                 dto.setContent(contentText);
                 dto.setImageUrl(imageUrl);
                 dto.setUrl(link);
                 dto.setCategory(null);
 
-                System.out.println("✅ 저장 시도: " + dto.getTitle());
                 newsService.saveHotTopicIfNotExists(dto);
                 savedCount++;
             }
 
-            System.out.println("🎉 연합뉴스 핫토픽 크롤링 완료, 저장된 뉴스 수: " + savedCount);
+            System.out.println("🎉 한국일보 본문 이미지 기준 크롤링 완료, 저장된 뉴스 수: " + savedCount);
 
         } catch (Exception e) {
             System.out.println("❌ 크롤링 중 오류 발생:");
@@ -91,19 +96,14 @@ public class HotTopicCrawler {
         }
     }
 
-    /**
-     * URL 예시: https://n.news.naver.com/article/001/0015429378?ntype=RANKING
-     * split 후 parts 배열은 ["https:", "", "n.news.naver.com", "article", "001", "0015429378?ntype=RANKING"]
-     * 따라서 length는 6이므로 parts.length >= 6 으로 체크해야 합니다.
-     */
     private static String generateNewsId(String link) {
         try {
             String[] parts = link.split("/");
             if (parts.length >= 6) {
-                String pressId = parts[4];              // "001"
-                String articleWithQuery = parts[5];     // "0015429378?ntype=RANKING"
-                String articleId = articleWithQuery.split("\\?")[0]; // "0015429378"
-                return pressId + "_" + articleId;       // 예: "001_0015429378"
+                String pressId = parts[4];              // "469"
+                String articleWithQuery = parts[5];     // "0000868808?ntype=RANKING"
+                String articleId = articleWithQuery.split("\\?")[0]; // "0000868808"
+                return pressId + "_" + articleId;
             }
         } catch (Exception e) {
             e.printStackTrace();
