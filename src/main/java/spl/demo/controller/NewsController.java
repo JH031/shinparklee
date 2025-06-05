@@ -5,6 +5,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import spl.demo.crawler.NaverNewsCrawler;
+import spl.demo.dto.CardDto;
 import spl.demo.entity.InterestCategoryEntity;
 import spl.demo.entity.NewsEntity;
 import spl.demo.service.NewsService;
@@ -80,15 +81,14 @@ public class NewsController {
         }
     }
 
-    @Operation(summary = "모든 뉴스 제목만 조회")
+    @Operation(summary = "모든 뉴스 카드용 정보 (newsId + title) 조회")
     @GetMapping("/titles")
-    public ResponseEntity<List<String>> getAllNewsTitles() {
-        List<String> titles = newsService.getAllNews()
-                .stream()
-                .map(NewsEntity::getTitle)
+    public ResponseEntity<List<CardDto>> getAllNewsTitles() {
+        List<CardDto> cards = newsService.getAllNews().stream()
+                .map(news -> new CardDto(news.getNewsId(), news.getTitle()))
                 .toList();
 
-        return ResponseEntity.ok(titles);
+        return ResponseEntity.ok(cards);
     }
 
 }
