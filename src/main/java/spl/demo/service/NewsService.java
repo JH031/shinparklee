@@ -3,6 +3,7 @@ package spl.demo.service;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import spl.demo.dto.CardDto;
 import spl.demo.dto.NewsDto;
 import spl.demo.dto.SummaryNewsDto;
 import spl.demo.entity.InterestCategoryEntity;
@@ -52,10 +53,16 @@ public class NewsService {
         return newsRepository.findAll();
     }
 
-    // ✅ 카테고리별 뉴스 조회
-    public List<NewsEntity> getNewsByCategory(InterestCategoryEntity category) {
-        return newsRepository.findByCategory(category);
+    public List<CardDto> getCardNewsByCategory(InterestCategoryEntity category) {
+        List<NewsEntity> newsList = (category == null)
+                ? newsRepository.findAll()
+                : newsRepository.findByCategory(category);
+
+        return newsList.stream()
+                .map(news -> new CardDto(news.getNewsId(), news.getTitle()))
+                .toList();
     }
+
 
     // ✅ Gemini를 활용한 뉴스 요약 → 기본 요약 + 말투 요약 모두 저장
     @Transactional

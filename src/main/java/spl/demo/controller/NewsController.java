@@ -70,17 +70,14 @@ public class NewsController {
     }
 
 
-    @Operation(summary = "뉴스 목록 조회")
-    @GetMapping
-    public ResponseEntity<List<NewsEntity>> getNews(
+    @Operation(summary = "카테고리별 뉴스 제목 카드 조회")
+    @GetMapping("/card")
+    public ResponseEntity<List<CardDto>> getCardNewsList(
             @RequestParam(name = "category", required = false) InterestCategoryEntity category
     ) {
-        if (category == null) {
-            return ResponseEntity.ok(newsService.getAllNews());
-        } else {
-            return ResponseEntity.ok(newsService.getNewsByCategory(category));
-        }
+        return ResponseEntity.ok(newsService.getCardNewsByCategory(category));
     }
+
 
     @Operation(summary = "모든 뉴스 카드용 정보 (newsId + title) 조회")
     @GetMapping("/titles")
