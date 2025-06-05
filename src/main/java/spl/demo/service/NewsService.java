@@ -75,7 +75,7 @@ public class NewsService {
                 for (SummaryStyle style : SummaryStyle.values()) {
                     if (style == SummaryStyle.DEFAULT) continue;
 
-                    boolean exists = styleSummaryRepository.findByNewsIdAndStyle(news.getId(), style).isPresent();
+                    boolean exists = styleSummaryRepository.findByNews_IdAndStyle(news.getId(), style).isPresent();
                     if (!exists) {
                         String styled = geminiService.generateStyledSummary(news.getContent(), style);
                         StyleSummaryEntity styledSummary = new StyleSummaryEntity(news, styled, style);

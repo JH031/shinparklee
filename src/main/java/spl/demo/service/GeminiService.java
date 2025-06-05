@@ -36,9 +36,20 @@ public class GeminiService {
 
         try {
             ResponseEntity<Map> response = restTemplate.postForEntity(requestUrl, request, Map.class);
+
+            System.out.println("📦 Gemini 응답: " + response.getBody());
+
+            if (response.getBody() == null) return "요약 중 오류 발생";
+
             List<Map<String, Object>> candidates = (List<Map<String, Object>>) response.getBody().get("candidates");
+            if (candidates == null || candidates.isEmpty()) return "요약 중 오류 발생";
+
             Map<String, Object> contentMap = (Map<String, Object>) candidates.get(0).get("content");
+            if (contentMap == null) return "요약 중 오류 발생";
+
             List<Map<String, String>> parts = (List<Map<String, String>>) contentMap.get("parts");
+            if (parts == null || parts.isEmpty()) return "요약 중 오류 발생";
+
             return parts.get(0).get("text");
         } catch (Exception e) {
             e.printStackTrace();

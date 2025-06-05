@@ -49,7 +49,7 @@ public class SummaryController {
         for (NewsEntity news : newsRepository.findAll()) {
             try {
                 // ✅ ID 기반으로 조회
-                boolean exists = styleSummaryRepository.findByNewsIdAndStyle(news.getId(), style).isPresent();
+                boolean exists = styleSummaryRepository.findByNews_IdAndStyle(news.getId(), style).isPresent();
 
                 if (exists) {
                     System.out.println("✅ 이미 존재함 - newsId=" + news.getId() + ", style=" + style);

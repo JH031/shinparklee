@@ -35,7 +35,7 @@ public class GeminiController {
         String summaryText = geminiService.generateStyledSummary(news.getContent(), style);
 
         // 3. 기존 요약이 있으면 갱신, 없으면 새로 저장
-        styleSummaryRepository.findByNewsIdAndStyle(newsId, style)
+        styleSummaryRepository.findByNews_IdAndStyle(newsId, style)
                 .ifPresentOrElse(existing -> {
                     existing.updateSummaryText(summaryText);
                     styleSummaryRepository.save(existing);
