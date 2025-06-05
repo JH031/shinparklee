@@ -111,7 +111,8 @@ public class NewsController {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("로그인이 필요합니다.");
         }
 
-        return ResponseEntity.ok(newsService.getAllNewsWithScrapStatus(userDetails.getUser().getId()));
+        String userId = userDetails.getUsername(); // userId로 조회
+        return ResponseEntity.ok(newsService.getAllNewsWithScrapStatus(userId));
     }
 
 }

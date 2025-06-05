@@ -11,13 +11,13 @@ import spl.demo.entity.*;
 import spl.demo.repository.NewsRepository;
 import spl.demo.repository.StyleSummaryRepository;
 import spl.demo.repository.SummaryRepository;
+import spl.demo.repository.SignupRepository;
+import spl.demo.repository.ScrapRepository;
 
 import java.time.LocalDateTime;
 import java.util.*;
 import java.util.function.Supplier;
 import java.util.stream.Collectors;
-import spl.demo.repository.SignupRepository;
-import spl.demo.repository.ScrapRepository;
 
 @Service
 @RequiredArgsConstructor
@@ -30,8 +30,6 @@ public class NewsService {
     private final SignupRepository signupRepository;
     private final ScrapRepository scrapRepository;
 
-
-    // 뉴스 저장 (중복 방지 + 큰따옴표 제거)
     public void saveNewsIfNotExists(NewsDto dto) {
         if (!newsRepository.existsByNewsId(dto.getNewsId())) {
             NewsEntity newsEntity = new NewsEntity();
@@ -39,7 +37,6 @@ public class NewsService {
             newsEntity.setTitle(dto.getTitle());
             newsEntity.setUrl(dto.getUrl());
 
-            // 큰따옴표 제거
             String cleanedContent = dto.getContent().replace("\"", "");
             newsEntity.setContent(cleanedContent);
 
@@ -51,18 +48,14 @@ public class NewsService {
         }
     }
 
-
-    // ✅ 전체 뉴스 조회 (컨트롤러에서 사용)
     public List<NewsEntity> getAllNews() {
         return newsRepository.findAll();
     }
 
-    // ✅ 카테고리별 뉴스 조회 (컨트롤러에서 사용)
     public List<NewsEntity> getNewsByCategory(InterestCategoryEntity category) {
         return newsRepository.findByCategory(category);
     }
 
-    // ✅ 카테고리별 카드 뉴스 조회
     public List<CardDto> getCardNewsByCategory(InterestCategoryEntity category) {
         List<NewsEntity> newsList = (category == null)
                 ? newsRepository.findAll()
@@ -73,7 +66,6 @@ public class NewsService {
                 .toList();
     }
 
-    // ✅ 핫토픽 뉴스 저장
     public void saveHotTopicIfNotExists(NewsDto dto) {
         if (!newsRepository.existsByNewsId(dto.getNewsId())) {
             NewsEntity newsEntity = new NewsEntity();
@@ -90,20 +82,17 @@ public class NewsService {
         }
     }
 
-    // ✅ Gemini 기반 전체 요약 생성 (기본 + 스타일)
     @Transactional
     public void summarizeAllNews() {
         List<NewsEntity> newsList = newsRepository.findAll();
 
         for (NewsEntity news : newsList) {
             try {
-                // ✅ 기본 요약
                 if (!summaryRepository.existsByNews(news)) {
                     String summaryText = callWithRetry(() -> geminiService.summarizeTo4Lines(news.getContent()));
                     summaryRepository.save(new SummaryEntity(news, summaryText));
                 }
 
-                // ✅ 스타일 요약
                 for (SummaryStyle style : SummaryStyle.values()) {
                     if (style == SummaryStyle.DEFAULT) continue;
 
@@ -117,7 +106,6 @@ public class NewsService {
                     }
                 }
 
-                // ✅ 요청 간 충분한 시간 간격
                 Thread.sleep(6000);
 
             } catch (InterruptedException ie) {
@@ -130,7 +118,6 @@ public class NewsService {
         }
     }
 
-    // ✅ 공통 재시도 로직 (429 등 에러 시 최대 3회 재시도)
     private String callWithRetry(Supplier<String> request) throws Exception {
         int retries = 0;
         while (true) {
@@ -139,14 +126,13 @@ public class NewsService {
             } catch (HttpClientErrorException.TooManyRequests e) {
                 if (retries++ >= 3) throw e;
 
-                long retryDelay = 60_000; // 60초 대기
+                long retryDelay = 60_000;
                 System.err.println("429 오류 발생, " + retryDelay / 1000 + "초 후 재시도 (" + retries + "회차)");
                 Thread.sleep(retryDelay);
             }
         }
     }
 
-    // ✅ 핫토픽 뉴스 요약 리스트 반환
     public List<SummaryNewsDto> getHotTopicSummariesWithAllStyles() {
         List<NewsEntity> hotNewsList = newsRepository.findByHotTopicTrue();
 
@@ -182,7 +168,6 @@ public class NewsService {
                 .collect(Collectors.toList());
     }
 
-    // ✅ 뉴스 제목 검색
     public List<SummaryNewsDto> searchNewsDtoByTitle(String keyword) {
         List<NewsEntity> newsList = newsRepository.findByTitleContainingIgnoreCase(keyword);
 
@@ -199,20 +184,31 @@ public class NewsService {
     }
 
     // ✅ 사용자 기준 스크랩 여부 포함 뉴스 목록
-    public List<NewsDto> getAllNewsWithScrapStatus(Long userId) {
-        SignupEntity user = signupRepository.findById(userId)
+    public List<NewsDto> getAllNewsWithScrapStatus(String userId) {
+        SignupEntity user = signupRepository.findByUserId(userId)
                 .orElseThrow(() -> new RuntimeException("사용자 없음"));
 
-        List<NewsEntity> allNews = newsRepository.findAll();
-        List<ScrapEntity> userScraps = scrapRepository.findByUser(user);
-
-        Set<Long> scrappedNewsIds = userScraps.stream()
-                .map(scrap -> scrap.getNews().getId())
+        List<ScrapEntity> scraps = scrapRepository.findByUser(user);
+        Set<Long> scrappedNewsIds = scraps.stream()
+                .map(s -> s.getNews().getId())
                 .collect(Collectors.toSet());
 
-        return allNews.stream()
-                .map(news -> new NewsDto(
-                ))
-                .collect(Collectors.toList());
+        return newsRepository.findAll().stream()
+                .map(news -> {
+                    boolean scrapped = scrappedNewsIds.contains(news.getId());
+
+                    NewsDto dto = new NewsDto();
+                    dto.setNewsId(news.getNewsId());
+                    dto.setTitle(news.getTitle());
+                    dto.setUrl(news.getUrl());               // 필요하면 포함
+                    dto.setContent(null);                    // 필요 없으면 null 처리
+                    dto.setImageUrl(news.getImageUrl());
+                    dto.setCategory(news.getCategory());     // 필요 없으면 생략 가능
+                    dto.setScrapped(scrapped);               // boolean 필드니까 isScrapped가 아닌 setScrapped로 설정
+
+                    return dto;
+                })
+                .toList();
     }
+
 }
