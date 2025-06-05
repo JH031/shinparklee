@@ -3,6 +3,7 @@ package spl.demo.service;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.client.HttpClientErrorException;
 import spl.demo.dto.CardDto;
 import spl.demo.dto.NewsDto;
 import spl.demo.dto.SummaryNewsDto;
@@ -13,6 +14,7 @@ import spl.demo.repository.SummaryRepository;
 
 import java.time.LocalDateTime;
 import java.util.*;
+import java.util.function.Supplier;
 import java.util.stream.Collectors;
 
 @Service
@@ -90,14 +92,13 @@ public class NewsService {
 
         for (NewsEntity news : newsList) {
             try {
-                // 기본 요약
+                // ✅ 기본 요약
                 if (!summaryRepository.existsByNews(news)) {
-                    String summaryText = geminiService.summarizeTo4Lines(news.getContent());
-                    SummaryEntity summary = new SummaryEntity(news, summaryText);
-                    summaryRepository.save(summary);
+                    String summaryText = callWithRetry(() -> geminiService.summarizeTo4Lines(news.getContent()));
+                    summaryRepository.save(new SummaryEntity(news, summaryText));
                 }
 
-                // 스타일 요약
+                // ✅ 스타일 요약
                 for (SummaryStyle style : SummaryStyle.values()) {
                     if (style == SummaryStyle.DEFAULT) continue;
 
@@ -106,20 +107,36 @@ public class NewsService {
                             .isPresent();
 
                     if (!exists) {
-                        String styled = geminiService.generateStyledSummary(news.getContent(), style);
-                        StyleSummaryEntity styledSummary = new StyleSummaryEntity(news, styled, style);
-                        styleSummaryRepository.save(styledSummary);
+                        String styledText = callWithRetry(() -> geminiService.generateStyledSummary(news.getContent(), style));
+                        styleSummaryRepository.save(new StyleSummaryEntity(news, styledText, style));
                     }
                 }
 
-                Thread.sleep(5000); // ✅ 요약 지연 방지
+                // ✅ 요청 간 충분한 시간 간격
+                Thread.sleep(6000);
 
             } catch (InterruptedException ie) {
                 Thread.currentThread().interrupt();
-                System.err.println("요약 작업이 인터럽트됨: " + news.getId());
+                System.err.println("요약 작업 인터럽트: " + news.getId());
             } catch (Exception e) {
                 System.err.println("❌ 요약 실패 - 뉴스 ID: " + news.getId());
                 e.printStackTrace();
+            }
+        }
+    }
+
+    // ✅ 공통 재시도 로직 (429 등 에러 시 최대 3회 재시도)
+    private String callWithRetry(Supplier<String> request) throws Exception {
+        int retries = 0;
+        while (true) {
+            try {
+                return request.get();
+            } catch (HttpClientErrorException.TooManyRequests e) {
+                if (retries++ >= 3) throw e;
+
+                long retryDelay = 60_000; // 60초 대기
+                System.err.println("429 오류 발생, " + retryDelay / 1000 + "초 후 재시도 (" + retries + "회차)");
+                Thread.sleep(retryDelay);
             }
         }
     }
