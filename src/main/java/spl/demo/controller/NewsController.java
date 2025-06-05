@@ -79,15 +79,22 @@ public class NewsController {
     }
 
 
-    @Operation(summary = "모든 뉴스 카드용 정보 (newsId + title) 조회")
+    @Operation(summary = "뉴스 제목 조회 (전체 또는 카테고리별)")
     @GetMapping("/titles")
-    public ResponseEntity<List<CardDto>> getAllNewsTitles() {
-        List<CardDto> cards = newsService.getAllNews().stream()
+    public ResponseEntity<List<CardDto>> getNewsTitlesByCategory(
+            @RequestParam(name = "category", required = false) InterestCategoryEntity category
+    ) {
+        List<NewsEntity> newsList = (category == null)
+                ? newsService.getAllNews()
+                : newsService.getNewsByCategory(category); // 수정된 메서드 사용
+
+        List<CardDto> cards = newsList.stream()
                 .map(news -> new CardDto(news.getNewsId(), news.getTitle()))
                 .toList();
 
         return ResponseEntity.ok(cards);
     }
+
 
     @Operation(summary = "뉴스 제목 키워드로 검색")
     @GetMapping("/search")
