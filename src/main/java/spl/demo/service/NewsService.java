@@ -168,6 +168,7 @@ public class NewsService {
                         .title(news.getTitle())
                         .url(news.getUrl())
                         .createdAt(news.getCreatedAt())
+                        .imageUrl(news.getImageUrl())
                         .summaries(null)
                         .build())
                 .toList();
