@@ -12,6 +12,7 @@ import org.springframework.web.filter.OncePerRequestFilter;
 import java.io.IOException;
 
 public class JwtAuthenticationFilter extends OncePerRequestFilter {
+
     private final JwtUtil jwtUtil;
     private final CustomUserDetailsService userDetailsService;
 
@@ -27,13 +28,21 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
         String uri = request.getRequestURI();
 
-        // ✅ 인증 없이 통과시킬 경로들 (회원가입, 로그인, 뉴스 크롤링)
-        if (uri.startsWith("/api/signup") || uri.startsWith("/api/login") || uri.startsWith("/api/news")) {
+        // ✅ 인증 없이 통과시킬 경로들 (정확한 경로만 허용)
+        if (
+                uri.startsWith("/api/signup") ||
+                        uri.startsWith("/api/login") ||
+                        uri.equals("/api/news") ||                     // 전체 뉴스 목록 조회
+                        uri.equals("/api/news/titles") ||              // 뉴스 제목만 조회
+                        uri.startsWith("/swagger") ||                  // Swagger UI
+                        uri.startsWith("/v3/api-docs") ||              // Swagger 문서
+                        uri.equals("/favicon.ico")
+        ) {
             filterChain.doFilter(request, response);
             return;
         }
 
-        // ⚙️ 나머지 요청은 JWT 검사
+        // ⚙️ 그 외 경로는 JWT 검사
         String header = request.getHeader("Authorization");
 
         if (header != null && header.startsWith("Bearer ")) {

@@ -65,7 +65,8 @@ public class SecurityConfig {
                                 "/v3/api-docs/**",
                                 "/api/crawler/**",
                                 "/api/summary/**",
-                                "/api/scrap/**"
+                                "/api/scrap/**",
+                                "/api/news/with-scrap"
                         ).permitAll()
                         .anyRequest().authenticated()
                 )
