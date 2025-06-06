@@ -1,0 +1,229 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8" />
+  <title>MyPage</title>
+  <link rel="stylesheet" href="CSS/mypage.css" />
+  <link rel="stylesheet" href="CSS/Header.css" />
+</head>
+<body>
+  <div class="content">
+    <div id="header-container"></div>
+
+    <aside class="profile-section">
+      <img src="assets/news1.png" alt="프로필 이미지" class="profile-img">
+      <div class="user-info">
+        <div class="user-id">
+          <span id="userId">아이디</span>
+          <button id="editBtn">✏️</button>
+        </div>
+        <p>스크랩 기사 수 <span id="scrapCount">0</span></p>
+      </div>
+      <ul id="interestList" class="interest-list"></ul>
+    </aside>
+
+    <section class="scrap-section">
+      <div id="scrapContainer"></div>
+    </section>
+  </div>
+
+  <!-- 수정 모달 -->
+  <div id="editModal" class="modal hidden">
+    <div class="modal-content">
+      <span class="close-btn">&times;</span>
+      <h2>회원정보 수정</h2>
+      <form id="editForm">
+
+        <label>관심 카테고리</label>
+        <div id="categoryCheckboxes">
+          <label><input type="checkbox" value="Politics"> 정치</label>
+          <label><input type="checkbox" value="Economy"> 경제</label>
+          <label><input type="checkbox" value="Society"> 사회</label>
+          <label><input type="checkbox" value="IT"> IT</label>
+          <label><input type="checkbox" value="Entertainment"> 연예</label>
+        </div>
+
+        <button type="submit">저장</button>
+      </form>
+    </div>
+  </div>
+
+  <script>
+    // ✅ 헤더 로딩 후 로그인 상태 및 카테고리 클릭 처리
+    fetch("components/Header.html")
+      .then(res => res.text())
+      .then(data => {
+        document.getElementById("header-container").innerHTML = data;
+
+        const loginBtn = document.getElementById("loginBtn");
+        const welcomeText = document.getElementById("welcomeText");
+        const storedUserId = localStorage.getItem("userId");
+        const isLoggedIn = localStorage.getItem("isLoggedIn") === "true";
+
+        if (isLoggedIn && storedUserId) {
+          if (loginBtn) loginBtn.style.display = "none";
+          if (welcomeText) {
+            welcomeText.style.display = "inline-block";
+            welcomeText.textContent = `${storedUserId}님 반가워요!`;
+            welcomeText.style.fontWeight = "bold";
+          }
+        } else {
+          if (loginBtn) {
+            loginBtn.style.display = "inline-block";
+            loginBtn.textContent = "Login";
+            loginBtn.onclick = () => location.href = "login.html";
+          }
+          if (welcomeText) welcomeText.style.display = "none";
+        }
+
+        // ✅ 헤더 내 카테고리 클릭 시 Home.html로 이동
+        document.querySelectorAll(".nav-links a[data-category]").forEach(link => {
+          link.addEventListener("click", function (e) {
+            e.preventDefault();
+            const category = this.getAttribute("data-category");
+            localStorage.setItem("selectedCategory", category);
+            location.href = "Home.html";
+          });
+        });
+      });
+
+    window.addEventListener("DOMContentLoaded", async () => {
+      const userIdElem = document.getElementById("userId");
+      const scrapCountElem = document.getElementById("scrapCount");
+      const interestList = document.getElementById("interestList");
+      const scrapContainer = document.getElementById("scrapContainer");
+      const token = localStorage.getItem("token");
+
+      if (!token) {
+        alert("로그인이 필요합니다.");
+        window.location.href = "login.html";
+        return;
+      }
+
+      try {
+        const res = await fetch("http://localhost:8080/api/scrap/mypage", {
+          headers: {
+            "Authorization": `Bearer ${token}`
+          }
+        });
+        const data = await res.json();
+
+        const { userId, scrapCount, interestCategories } = data;
+
+        localStorage.setItem("userId", userId);
+        localStorage.setItem("isLoggedIn", "true");
+
+        userIdElem.textContent = userId;
+        scrapCountElem.textContent = scrapCount || 0;
+
+        interestList.innerHTML = "";
+        interestCategories.forEach(cat => {
+          const li = document.createElement("li");
+          li.textContent = cat;
+          interestList.appendChild(li);
+        });
+
+        const groupedRes = await fetch("http://localhost:8080/api/scrap/mypage/grouped", {
+          headers: {
+            "Authorization": `Bearer ${token}`
+          }
+        });
+        const groupedData = await groupedRes.json();
+        scrapContainer.innerHTML = "";
+
+        groupedData.forEach(group => {
+        const section = document.createElement("div");
+        section.className = "scrap-category";
+
+        const title = document.createElement("h3");
+        title.textContent = group.category;
+        section.appendChild(title);
+
+        group.scraps.forEach(news => {
+          const article = document.createElement("div");
+          article.className = "news-card";
+          article.innerHTML = `
+            <a href="CardDetail.html" class="news-link" data-news-id="${news.newsId}">
+              <img src="${news.imageUrl || 'assets/news1.png'}" alt="뉴스 이미지" />
+              <div class="news-title">${news.title}</div>
+            </a>
+          `;
+          section.appendChild(article);
+        });
+
+        scrapContainer.appendChild(section);
+      });
+
+      } catch (err) {
+        console.error("유저 정보 불러오기 실패:", err);
+      }
+    });
+
+    document.addEventListener("click", async (e) => {
+      const token = localStorage.getItem("token");
+      const modal = document.getElementById("editModal");
+
+      if (e.target.id === "editBtn") {
+        modal.classList.remove("hidden");
+        try {
+          const res = await fetch("http://localhost:8080/api/users/me", {
+            headers: {
+              "Authorization": `Bearer ${token}`
+            }
+          });
+          const user = await res.json();
+          
+          const checks = document.querySelectorAll("#categoryCheckboxes input");
+          checks.forEach(chk => chk.checked = user.interestCategories.includes(chk.value));
+        } catch (err) {
+          console.error("회원정보 로딩 실패", err);
+        }
+      }
+
+      if (e.target.classList.contains("close-btn")) {
+        modal.classList.add("hidden");
+      }
+    });
+
+    document.getElementById("editForm").addEventListener("submit", async (e) => {
+      e.preventDefault();
+      const token = localStorage.getItem("token");
+
+      const updated = {
+        style: document.getElementById("style").value,
+        interestCategories: Array.from(document.querySelectorAll("#categoryCheckboxes input:checked")).map(c => c.value)
+      };
+
+      try {
+        const res = await fetch("http://localhost:8080/api/users/me", {
+          method: "PUT",
+          headers: {
+            "Content-Type": "application/json",
+            "Authorization": `Bearer ${token}`
+          },
+          body: JSON.stringify(updated)
+        });
+
+        if (res.ok) {
+          alert("회원정보 수정 완료");
+          document.getElementById("editModal").classList.add("hidden");
+          location.reload();
+        } else {
+          alert("수정 실패");
+        }
+      } catch (err) {
+        console.error("수정 오류", err);
+      }
+    });
+    // 마이페이지 카드 클릭 시 뉴스 ID 저장
+    document.getElementById("scrapContainer").addEventListener("click", (e) => {
+      const link = e.target.closest(".news-link");
+      if (link) {
+        const newsId = link.dataset.newsId;
+        localStorage.setItem("selectedNewsId", newsId);
+      }
+    });
+
+  </script>
+</body>
+</html>

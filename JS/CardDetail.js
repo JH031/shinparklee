@@ -1,32 +1,121 @@
-const container = document.getElementById('newsDetailContainer');
-const params = new URLSearchParams(window.location.search);
-const newsId = params.get('newsId');
+document.addEventListener("DOMContentLoaded", async function () {
+  const container = document.getElementById("newsDetailContainer");
+  const newsId = localStorage.getItem("selectedNewsId");
+  const token = localStorage.getItem("token");
 
-if (!newsId) {
-  container.innerHTML = '<p>뉴스 ID가 없습니다.</p>';
-} else {
-  fetch('http://localhost:8080/api/summary/basic')
-    .then(res => res.json())
-    .then(data => {
-      const news = data.find(n => n.newsId === newsId);
-      if (!news) {
-        container.innerHTML = '<p>뉴스를 찾을 수 없습니다.</p>';
+  if (!newsId) {
+    container.innerHTML = "<p>선택된 뉴스가 없습니다.</p>";
+    return;
+  }
+
+  let item = null;
+  let styledSummaries = {};
+
+  try {
+    // 기본 요약 불러오기
+    const res = await fetch("http://localhost:8080/api/summary/basic");
+    const data = await res.json();
+    item = data.find(news => news.newsId === newsId);
+
+    if (!item) {
+      container.innerHTML = "<p>뉴스 정보를 찾을 수 없습니다.</p>";
+      return;
+    }
+
+    const { title, url, imageUrl, createdAt, summaries = {} } = item;
+    styledSummaries["DEFAULT"] = summaries["DEFAULT"] || "(요약 없음)";
+
+    // 스크랩 상태 확인
+    let isScrapped = false;
+    let starIcon = "assets/emptystar.png";
+
+    if (token) {
+      try {
+        const withScrapRes = await fetch("http://localhost:8080/api/news/with-scrap", {
+          headers: { "Authorization": `Bearer ${token}` }
+        });
+        if (withScrapRes.ok) {
+          const allNews = await withScrapRes.json();
+          const matchedNews = allNews.find(n => n.newsId === newsId);
+          isScrapped = matchedNews?.scrapped === true;
+          starIcon = isScrapped ? "assets/fillstar.png" : "assets/emptystar.png";
+        }
+      } catch (err) {
+        console.warn("스크랩 확인 실패:", err);
+      }
+    }
+
+    // 상세 내용 출력
+    container.innerHTML = `
+    <div class="news-detail-card">
+      <img src="${imageUrl || 'assets/news1.png'}" alt="뉴스 이미지" class="news-detail-image" />
+      <div class="title-line">
+        <h2 class="news-detail-title">${title}</h2>
+        <div class="right-controls" style="display: flex; align-items: center; gap: 20px;">
+          <img id="scrapIcon" src="${starIcon}" alt="스크랩 아이콘" class="scrap-icon-inline" />
+          <label for="styleSelect" style="white-space: nowrap;">말투 선택:</label>
+          <select id="styleSelect">
+            <option value="DEFAULT">기본</option>
+            <option value="FUNNY">재미있게</option>
+            <option value="SIMPLE">쉽게</option>
+            <option value="FRIENDLY">친근하게</option>
+          </select>
+        </div>
+      </div>
+      <p id="summaryText" class="news-detail-summary">${styledSummaries["DEFAULT"]}</p>
+      <a href="${url}" target="_blank" class="news-detail-link">원문 보기</a>
+    </div>
+  `;
+
+
+    // 스크랩 기능
+    document.getElementById("scrapIcon").addEventListener("click", async () => {
+      if (!token) return alert("로그인 후 스크랩할 수 있습니다.");
+
+      try {
+        const res = await fetch(`http://localhost:8080/api/scrap/${newsId}`, {
+          method: "POST",
+          headers: { "Authorization": `Bearer ${token}` }
+        });
+
+        if (res.ok) {
+          alert("스크랩 완료!");
+          document.getElementById("scrapIcon").src = "assets/fillstar.png";
+        } else {
+          alert("스크랩 실패");
+        }
+      } catch (err) {
+        console.error("스크랩 실패:", err);
+      }
+    });
+
+    // 드롭다운 변경 시 자동 변환
+    document.getElementById("styleSelect").addEventListener("change", async (e) => {
+      const selectedStyle = e.target.value;
+      const summaryTextElem = document.getElementById("summaryText");
+
+      if (styledSummaries[selectedStyle]) {
+        summaryTextElem.textContent = styledSummaries[selectedStyle];
         return;
       }
 
-      const { title, url, summaries } = news;
-      const content = summaries?.additionalProp1 || '(요약 없음)';
-      const imageUrl = "assets/default-news.jpg"; // 이미지 없음 처리
-
-      container.innerHTML = `
-        <img src="${imageUrl}" alt="뉴스 이미지" style="width:100%; border-radius:10px;" />
-        <h2>${title}</h2>
-        <p>${content}</p>
-        <a href="${url}" target="_blank" class="detail-btn">원문 보기</a>
-      `;
-    })
-    .catch(err => {
-      container.innerHTML = '<p>뉴스를 불러오지 못했습니다.</p>';
-      console.error(err);
+      try {
+        const res = await fetch(`http://localhost:8080/api/summary/style?style=${selectedStyle}`, {
+          headers: token ? { "Authorization": `Bearer ${token}` } : {}
+        });
+        const styleData = await res.json();
+        const styledItem = styleData.find(n => n.newsId === newsId);
+        const summary = styledItem?.summaries?.[selectedStyle] || "(요약 없음)";
+        styledSummaries[selectedStyle] = summary;
+        summaryTextElem.textContent = summary;
+      } catch (err) {
+        console.error("스타일 요약 불러오기 실패:", err);
+        summaryTextElem.textContent = "(요약 변환 실패)";
+      }
     });
-}
+
+  } catch (err) {
+    console.error("뉴스 상세 불러오기 실패:", err);
+    container.innerHTML = "<p>뉴스 정보를 불러오는 중 오류가 발생했습니다.</p>";
+  }
+});

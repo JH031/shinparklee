@@ -1,0 +1,46 @@
+/* CSS/Header.css */
+
+header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 20px 0;
+  border-bottom: 1px solid #ccc;
+  background-color: #fff;
+}
+.header-nav a {
+  margin: 0 10px;
+  text-decoration: none;
+  color: black;
+  
+}
+
+.header-nav a:hover {
+  text-decoration: underline;
+}
+
+
+.nav-links {
+  display: flex;
+  gap: 20px;
+}
+
+.nav-links a {
+  text-decoration: none;
+  color: black;
+  font-size: 18px;
+}
+
+.search-icon {
+  font-size: 20px;
+  margin-left: 15px;
+  display: inline-block;
+}
+
+#welcomeText {
+  font-size: 14px;
+  color: black;
+  white-space: nowrap;
+  font-weight: bold;
+}
+

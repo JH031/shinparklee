@@ -7,7 +7,7 @@ body {
   padding: 0;
 }
 h1, h2 {
-  text-align: center;
+  text-align: left;
 }
 input[type="text"],
 input[type="password"],
@@ -160,237 +160,69 @@ header {
   object-fit: cover;
   margin-right: 15px;
 }
-
-/* ==================== */
-/* 로그인 페이지 스타일 */
-/* ==================== */
-.container {
-  width: 300px;
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
-  margin: auto;
-  padding-top: 15vh;
-}
-.content {
-   max-width: 1200px; /* ✅ 화면이 너무 넓어지지 않도록 제한 */
-  margin: 0 auto;    /* ✅ 좌우 가운데 정렬 */
-  padding: 0 20px;   /* ✅ 좌우 약간의 여백 */
-}
-
-.logo {
-  font-size: 20px;
-}
-.log-btn {
-  width: 100%;
-  padding: 10px;
-  background-color: #000000;
-  color: white;
-  border: none;
-  border-radius: 5px;
-  cursor: pointer;
-}
-
-
-/* ====================== */
-/* 회원가입 페이지 스타일 */
-/* ====================== */
-.signup-layout {
-  display: flex;
-  align-items: flex-start;
-  gap: 40px;
-}
-.news-logo {
-  width: 470px;
-  height: 470px;
-  transform: translateY(20%) translateX(-20%);
-  margin-left: 20px;
-  object-fit: contain;
-}
-label {
-  display: block;
-  margin-bottom: 5px;
-  font-size: 13px;
-}
-.id-wrapper {
-  position: relative;
-  width: 100%;
-  margin-bottom: 15px;
-}
-.id-wrapper input[type="text"] {
-  width: 100%;
-  padding-right: 90px;
-  padding: 10px;
-  box-sizing: border-box;
-}
-.check-btn {
-  position: absolute;
-  top: 50%;
-  right: 10px;
-  transform: translateY(-75%);
-  padding: 6px 9px;
-  background-color: white;
-  border: 1px solid #ccc;
-  border-radius: 20px;
-  font-size: 12px;
-  cursor: pointer;
-  color: #333;
-}
-.label-row {
-  display: flex;
-  align-items: center;
-  gap: 10px; /* 간격 조절 */
-  margin-bottom: 5px; /* 아래 입력창과 간격 */
-}
-.label-row .message {
-  margin: 0;
-  font-size: 13px;
-}
-
-.message {
-  font-size: 0.8em;
-  margin-top: 0;
-  margin-bottom: 20px;
-  line-height: 1.2;
-}
-
-.message.success {
-  color: green;
-}
-
-.message.error {
-  color: red;
-}
-
-.category-tags {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 5px;
-  margin-bottom: 10px;
-}
-.category-tag {
-  background-color: #d9d9d9;
-  padding: 1px 10px;
-  border-radius: 20px;
-  font-size: 13px;
-  display: flex;
-  align-items: center;
-}
-.category-button {
-  background-color: #000000;
-  color: white;
-  padding: 10px 20px;
-  border-radius: 6px;
-  font-weight: bold;
-  border: none;
-  cursor: pointer;
-}
-#categorySelect {
-  margin-top: 6px;
-  padding: 10px;
-  border-radius: 6px;
-  border: 1px solid #ccc;
-  width: 100%; /* 부모(category-filter)의 너비를 따라감 (버튼과 동일) */
-  box-sizing: border-box;
-  font-size: 14px;
-}
-.category-wrapper {
-   display: flex;
-  flex-direction: column;
-  align-items: flex-end;
-  position: relative;
-  margin-left: 20px;
-}
-.category-tag .remove-btn {
-  background: none;
-  border: none;
-  margin-left: 5px;
-  cursor: pointer;
-  font-weight: bold;
-  font-size: 14px;
-}
-.submit-btn {
-  width: 100%;
-  padding: 10px;
-  background-color: black;
-  color: white;
-  border: none;
-  border-radius: 5px;
-  cursor: pointer;
-  margin-top: 10px;
-}
-.agreement {
-  font-size: 12px;
-  display: flex;
-  align-items: center;
-  gap: 5px;
-  margin-bottom: 15px;
-}
-
-/* ====================== */
-/* Hot 토픽픽 스타일 */
-/* ====================== */
-.briefing-container {
+/* CSS/styles.css 내에 추가 */
+.news-detail-card {
   max-width: 600px;
-  margin: 0 auto;
+  margin: 30px auto;
+  padding: 20px;
+  border: 1px solid #ccc;
+  border-radius: 12px;
+  background-color: #fff;
   text-align: center;
 }
 
-.carousel {
-  position: relative;
+.news-detail-image {
+  width: 100%;
+  border-radius: 10px;
 }
 
-.navigation-buttons {
+.news-detail-title {
+  margin-top: 20px;
+  font-size: 24px;
+  font-weight: bold;
+}
+
+.news-detail-summary {
+  margin-top: 15px;
+  font-size: 16px;
+  color: #333;
+  text-align: left;
+}
+
+.news-detail-date {
   margin-top: 10px;
+  font-size: 14px;
+  color: gray;
 }
 
-.navigation-buttons button {
-  font-size: 24px;
-  padding: 8px 12px;
-  margin: 0 10px;
-  border: none;
-  background-color: #eee;
-  cursor: pointer;
-  border-radius: 8px;
-}
-.header-row {
-  display: flex;
-  align-items: center;
-  gap: 10px;
-  padding: 10px;
-}
-
-.back-button {
-  background: none;
-  border: none;
-  font-size: 24px;
-  cursor: pointer;
-}
-
-.progress-indicator {
-  display: flex;
-  justify-content: center;
-  margin: 10px 0;
-  gap: 8px;
-}
-
-.dot {
-  width: 10px;
-  height: 10px;
-  border-radius: 50%;
-  background-color: lightgray;
-}
-
-.dot.active {
-  background-color: #555;
-}
-.detail-btn {
+.news-detail-link {
   display: inline-block;
-  margin-top: 10px;
+  margin-top: 15px;
   padding: 8px 16px;
-  background-color: #ff7f2a;
+  background-color: #ffa500;
   color: white;
-  text-decoration: none;
   border-radius: 6px;
+  text-decoration: none;
 }
+
+.title-line {
+  display: inline-flex;
+  align-items: center;
+  flex-wrap: wrap;
+}
+
+.news-detail-title {
+  font-size: 24px;
+  font-weight: bold;
+  display: inline;
+  line-height: 1.4;
+}
+
+.scrap-icon-inline {
+  width: 18px;
+  height: 18px;
+  margin-left: 6px;
+  cursor: pointer;
+}
+
 

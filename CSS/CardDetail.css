@@ -1,0 +1,48 @@
+/* CSS/styles.css 내에 추가 */
+.news-detail-card {
+  max-width: 600px;
+  margin: 30px auto;
+  padding: 20px;
+  border: 1px solid #ccc;
+  border-radius: 12px;
+  background-color: #fff;
+  text-align: center;
+}
+
+.news-detail-image {
+  width: 100%;
+  border-radius: 10px;
+}
+
+.news-detail-title {
+  margin-top: 20px;
+  font-size: 24px;
+  font-weight: bold;
+}
+
+.news-detail-summary {
+  margin-top: 15px;
+  font-size: 16px;
+  color: #333;
+}
+
+.news-detail-date {
+  margin-top: 10px;
+  font-size: 14px;
+  color: gray;
+}
+
+.news-detail-link {
+  display: inline-block;
+  margin-top: 15px;
+  padding: 8px 16px;
+  background-color: #ffa500;
+  color: white;
+  border-radius: 6px;
+  text-decoration: none;
+}
+.right-controls {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}

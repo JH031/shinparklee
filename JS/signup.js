@@ -6,9 +6,6 @@ document.getElementById("signupForm").addEventListener("submit", async function(
   const categories = [...document.querySelectorAll(".category-tag")]
     .map(tag => tag.firstChild.textContent.trim());
 
-  const style = document.getElementById("style").value;
-
-
   const dto = {
     username: document.getElementById("username").value,
     userId: document.getElementById("userId").value,
@@ -16,7 +13,6 @@ document.getElementById("signupForm").addEventListener("submit", async function(
     confirmPassword: document.getElementById("confirm").value,
     email: document.getElementById("email").value,
     interestCategories: categories, // 리스트로 보냄
-    style: style
   };
 
   try {

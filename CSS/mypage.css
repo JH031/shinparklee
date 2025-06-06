@@ -1,0 +1,190 @@
+/* CSS/mypage.css */
+
+body {
+  font-family: Arial, sans-serif;
+  margin: 0;
+  padding: 0;
+  background-color: #fff;
+}
+
+/* 화면 전체 너비에서 가운데로 제한하는 콘텐츠 컨테이너 */
+/* 콘텐츠 전체 레이아웃: 왼쪽 프로필, 오른쪽 뉴스 */
+.content {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 0 20px;
+  box-sizing: border-box;
+}
+
+/* 프로필 사이드바: 고정 너비 */
+.profile-section {
+  width: 250px;
+  background-color: #f9f9f9;
+  padding: 20px;
+  border-radius: 12px;
+  box-shadow: 0 0 6px rgba(0,0,0,0.1);
+  flex-shrink: 0;
+}
+/* 뉴스 영역은 나머지 너비 차지 */
+.scrap-section {
+  flex: 1;
+  min-width: 0; /* 줄바꿈 방지 */
+}
+
+.profile-img {
+  width: 80px;
+  height: 80px;
+  border-radius: 50%;
+  object-fit: cover;
+  margin-bottom: 15px;
+}
+
+.user-info {
+  margin-top: 10px;
+}
+
+.user-id {
+  font-weight: bold;
+  font-size: 18px;
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  margin-bottom: 5px;
+}
+
+.interest-list {
+  list-style: none;
+  padding: 0;
+  margin-top: 15px;
+  font-size: 14px;
+  line-height: 1.6;
+}
+
+.scrap-section {
+  flex: 1;
+}
+
+.scrap-category {
+  margin-bottom: 40px;
+}
+
+.scrap-category h3 {
+  border-bottom: 1px solid #ccc;
+  padding-bottom: 6px;
+  margin-bottom: 15px;
+}
+
+.news-card {
+  width: 220px;
+  border: 1px solid #ccc;
+  border-radius: 8px;
+  overflow: hidden;
+  margin: 10px;
+  background-color: #f9f9f9;
+  display: inline-block;
+  vertical-align: top;
+  text-align: center;
+}
+
+.news-card img {
+  width: 100%;
+  height: 130px;
+  object-fit: cover;
+}
+
+.news-title {
+  padding: 10px;
+  font-size: 14px;
+  font-weight: bold;
+  color: #333;
+}
+.news-card p {
+  margin: 0;
+  font-size: 15px;
+  line-height: 1.4;
+  font-weight: 500;
+}
+
+
+/* 모달 스타일 */
+.modal {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  background: rgba(0, 0, 0, 0.5);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 1000;
+}
+
+.modal.hidden {
+  display: none;
+}
+.modal-content {
+  width: 400px;         /* 작고 알맞은 폭 */
+  padding: 20px;
+  background: white;
+  border-radius: 10px;
+  box-shadow: 0 0 10px rgba(0,0,0,0.2);
+  margin: 10% auto;     /* 수직 위치 적당히 아래로 */
+}
+/* 모달 제목 정렬 */
+.modal-content h2 {
+  font-size: 20px;
+  margin-bottom: 20px;
+  font-weight: bold;
+}
+
+
+.close-btn {
+  position: absolute;
+  top: 15px;
+  right: 20px;
+  cursor: pointer;
+  font-size: 20px;
+}
+
+#editForm input,
+#editForm select {
+  width: 100%;
+  padding: 10px;
+  margin-top: 5px;
+  margin-bottom: 15px;
+  border: 1px solid #ccc;
+  border-radius: 6px;
+  box-sizing: border-box;
+}
+/* 말투 라벨 스타일 통일 */
+#editForm label {
+  font-size: 15px;
+  font-weight: 500;
+  margin-bottom: 5px;
+  display: block;
+}
+/* 저장 버튼 호버 효과 a/
+#editForm button[type="submit"]:hover {
+  background-color: #333;
+}
+
+/* 관심 카테고리 박스 스타일 개선 */
+/* 관심 카테고리 컨테이너 */
+#categoryCheckboxes {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px 20px;
+  margin-top: 10px;
+  margin-bottom: 20px;
+}
+
+/* 각 체크박스 라벨 스타일 */
+#categoryCheckboxes label {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 15px;
+  font-weight: 400;
+  min-width: 140px; /* 가로 정렬을 위한 최소 너비 */
+}
