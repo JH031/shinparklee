@@ -33,7 +33,8 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
                 uri.startsWith("/api/signup") ||
                         uri.startsWith("/api/login") ||
                         uri.equals("/api/news") ||                     // 전체 뉴스 목록 조회
-                        uri.equals("/api/news/titles") ||              // 뉴스 제목만 조회
+                        uri.equals("/api/news/titles") ||
+                        uri.startsWith("/api/summary/detail") ||
                         uri.startsWith("/swagger") ||                  // Swagger UI
                         uri.startsWith("/v3/api-docs") ||              // Swagger 문서
                         uri.equals("/favicon.ico")

@@ -15,4 +15,6 @@ public interface SummaryRepository extends JpaRepository<SummaryEntity, Long> {
     @Query("SELECT s FROM SummaryEntity s WHERE s.news.hotTopic = true")
     List<SummaryEntity> findByNewsIn(List<NewsEntity> newsList);
 
+    Optional<SummaryEntity> findByNews_NewsId(String newsId);
+
 }

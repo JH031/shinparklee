@@ -93,4 +93,29 @@ public class SummaryController {
         return ResponseEntity.ok(result);
     }
 
+    @GetMapping("/detail/{newsId}")
+    @Operation(summary = "특정 뉴스의 기본 요약 상세 조회")
+    public ResponseEntity<?> getSingleNewsSummary(@PathVariable("newsId") String newsId) {
+        SummaryEntity summary = summaryRepository.findByNews_NewsId(newsId)
+                .orElseThrow(() -> new RuntimeException("해당 뉴스의 기본 요약이 없습니다."));
+
+        EnumMap<SummaryStyle, String> map = new EnumMap<>(SummaryStyle.class);
+        map.put(SummaryStyle.DEFAULT, summary.getSummaryText());
+
+        NewsEntity news = summary.getNews();
+
+        SummaryNewsDto dto = new SummaryNewsDto(
+                news.getId(),
+                news.getNewsId(),
+                news.getTitle(),
+                news.getUrl(),
+                news.getImageUrl(),
+                news.getCreatedAt(),
+                map
+        );
+
+        return ResponseEntity.ok(dto);
+    }
+
+
 }
