@@ -106,8 +106,6 @@ public class NewsService {
                     }
                 }
 
-                Thread.sleep(2000);
-
             } catch (InterruptedException ie) {
                 Thread.currentThread().interrupt();
                 System.err.println("요약 작업 인터럽트: " + news.getId());
@@ -119,19 +117,9 @@ public class NewsService {
     }
 
     private String callWithRetry(Supplier<String> request) throws Exception {
-        int retries = 0;
-        while (true) {
-            try {
-                return request.get();
-            } catch (HttpClientErrorException.TooManyRequests e) {
-                if (retries++ >= 3) throw e;
-
-                long retryDelay = 60_000;
-                System.err.println("429 오류 발생, " + retryDelay / 1000 + "초 후 재시도 (" + retries + "회차)");
-                Thread.sleep(retryDelay);
-            }
-        }
+        return request.get(); // 바로 요청, 실패 시 예외 발생
     }
+
 
     public List<SummaryNewsDto> getHotTopicSummariesWithAllStyles() {
         List<NewsEntity> hotNewsList = newsRepository.findByHotTopicTrue();
