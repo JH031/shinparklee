@@ -19,6 +19,4 @@ public class SignupDto {
     private String confirmPassword;
     private String email;
     private List<InterestCategoryEntity> interestCategories;
-    private SummaryStyle style;
-
 }
