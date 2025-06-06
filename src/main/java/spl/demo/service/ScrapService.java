@@ -167,7 +167,6 @@ public class ScrapService {
         return new MyPageDto(
                 user.getUserId(),
                 scraps.size(),
-                user.getStyle(),
                 user.getInterestCategories(),
                 scrapSummaries
         );
