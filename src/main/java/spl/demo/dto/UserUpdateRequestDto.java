@@ -13,5 +13,4 @@ import java.util.List;
 @NoArgsConstructor
 public class UserUpdateRequestDto {
     private List<InterestCategoryEntity> interestCategories;
-    private SummaryStyle style;
 }

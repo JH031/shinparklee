@@ -22,8 +22,7 @@ public class UserService {
                 user.getUsername(),
                 user.getUserId(),
                 user.getEmail(),
-                user.getInterestCategories(),
-                user.getStyle()
+                user.getInterestCategories()
         );
     }
     @Transactional
@@ -33,10 +32,6 @@ public class UserService {
 
         if (dto.getInterestCategories() != null) {
             user.setInterestCategories(dto.getInterestCategories());
-        }
-
-        if (dto.getStyle() != null) {
-            user.setStyle(dto.getStyle());
         }
     }
 
