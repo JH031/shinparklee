@@ -106,7 +106,7 @@ public class NewsService {
                     }
                 }
 
-                Thread.sleep(6000);
+                Thread.sleep(2000);
 
             } catch (InterruptedException ie) {
                 Thread.currentThread().interrupt();
