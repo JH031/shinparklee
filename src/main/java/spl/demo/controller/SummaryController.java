@@ -99,14 +99,13 @@ public class SummaryController {
         SummaryEntity summary = summaryRepository.findByNews_NewsId(newsId)
                 .orElseThrow(() -> new RuntimeException("해당 뉴스의 기본 요약이 없습니다."));
 
-        NewsEntity news = summary.getNews();
+        NewsEntity news = summary.getNews(); // ✅ NewsEntity 가져오기
 
-        // 요약 맵 구성
         EnumMap<SummaryStyle, String> map = new EnumMap<>(SummaryStyle.class);
         map.put(SummaryStyle.DEFAULT, summary.getSummaryText());
 
-        // 스타일 요약 추가
-        List<StyleSummaryEntity> styledSummaries = styleSummaryRepository.findByNews_NewsId(newsId);
+        // ✅ 스타일 요약은 newsEntity 기준으로 조회
+        List<StyleSummaryEntity> styledSummaries = styleSummaryRepository.findByNews(news);
         for (StyleSummaryEntity s : styledSummaries) {
             map.put(s.getStyle(), s.getSummaryText());
         }

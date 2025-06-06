@@ -14,5 +14,6 @@ public interface StyleSummaryRepository extends JpaRepository<StyleSummaryEntity
     List<StyleSummaryEntity> findByStyle(SummaryStyle style);
 
     List<StyleSummaryEntity> findByNews_NewsId(String newsId);
+    List<StyleSummaryEntity> findByNews(NewsEntity news);
 
 }
