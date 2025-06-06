@@ -14,7 +14,6 @@ import java.util.List;
 public class MyPageDto {
     private String userId;
     private int scrapCount;
-    private SummaryStyle style;
     private List<InterestCategoryEntity> interestCategories;
     private List<ScrapSummaryDto> scraps;
 }

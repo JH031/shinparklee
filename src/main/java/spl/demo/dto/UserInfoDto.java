@@ -14,5 +14,4 @@ public class UserInfoDto {
     private String userId;
     private String email;
     private List<InterestCategoryEntity> interestCategories;
-    private SummaryStyle style;
 }
