@@ -172,8 +172,19 @@
           `;
           newsContainer.appendChild(card);
 
-          card.addEventListener("click", () => {
-            localStorage.setItem("selectedNewsId", news.newsId);
+          card.addEventListener("click", async () => {
+          const newsId = news.newsId;
+          localStorage.setItem("selectedNewsId", newsId);
+
+          const token = localStorage.getItem("token");
+          if (token) {
+            await fetch(`http://localhost:8080/api/news/click/${newsId}`, {
+              method: "POST",
+              headers: {
+                "Authorization": `Bearer ${token}`
+              }
+            });
+          }
             location.href = "CardDetail.html";
           });
         });
@@ -272,18 +283,20 @@
         const container = document.getElementById(containerId);
 
         container.innerHTML = `
-          <div class="header-row">
-            <h2>🔥 오늘의 브리핑</h2>
-          </div>
-          <div class="progress-indicator" id="progressIndicator"></div>
-          <div class="carousel">
-            <div class="card" id="cardContent"></div>
-            <div class="navigation-buttons">
-              <button id="prevBtn">◀</button>
-              <button id="nextBtn">▶</button>
-            </div>
-          </div>
-        `;
+  <div class="header-row">
+    <h2> 오늘의 핫토픽</h2>
+  </div>
+  <div class="carousel">
+    <button id="prevBtn" class="carousel-btn prev-btn">〈</button>
+    
+    <div class="card-wrapper">
+      <div class="card" id="cardContent"></div>
+    </div>
+    
+    <button id="nextBtn" class="carousel-btn next-btn">〉</button>
+  </div>
+  <div class="progress-indicator" id="progressIndicator"></div>
+`;
 
         const card = container.querySelector("#cardContent");
         const prevBtn = container.querySelector("#prevBtn");
@@ -311,9 +324,10 @@
           const image = imageUrl || 'assets/news1.png';
 
           card.innerHTML = `
-            <img src="${image}" alt="뉴스 이미지" style="width:100%; border-radius:10px;" />
-            <h3>${title}</h3>
-          `;
+  <img src="${image}" alt="뉴스 이미지"
+       style="width:100%; object-fit:cover; border-radius:10px;" />
+  <h3>${title}</h3>
+`;
           renderProgress();
         }
 

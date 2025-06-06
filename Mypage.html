@@ -5,6 +5,9 @@
   <title>MyPage</title>
   <link rel="stylesheet" href="CSS/mypage.css" />
   <link rel="stylesheet" href="CSS/Header.css" />
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-datalabels@2"></script>
+
 </head>
 <body>
   <div class="content">
@@ -24,6 +27,11 @@
 
     <section class="scrap-section">
       <div id="scrapContainer"></div>
+    </section>
+
+    <!-- 👇 클릭 수 통계 차트를 위한 캔버스 -->
+    <section style="margin: 40px auto; width: 60%;">
+      <canvas id="clickChart"></canvas>
     </section>
   </div>
 
@@ -101,15 +109,13 @@
       }
 
       try {
+        // 📌 스크랩 관련 데이터 로딩
         const res = await fetch("http://localhost:8080/api/scrap/mypage", {
-          headers: {
-            "Authorization": `Bearer ${token}`
-          }
+          headers: { "Authorization": `Bearer ${token}` }
         });
         const data = await res.json();
 
         const { userId, scrapCount, interestCategories } = data;
-
         localStorage.setItem("userId", userId);
         localStorage.setItem("isLoggedIn", "true");
 
@@ -124,35 +130,77 @@
         });
 
         const groupedRes = await fetch("http://localhost:8080/api/scrap/mypage/grouped", {
-          headers: {
-            "Authorization": `Bearer ${token}`
-          }
+          headers: { "Authorization": `Bearer ${token}` }
         });
         const groupedData = await groupedRes.json();
         scrapContainer.innerHTML = "";
 
         groupedData.forEach(group => {
-        const section = document.createElement("div");
-        section.className = "scrap-category";
+          const section = document.createElement("div");
+          section.className = "scrap-category";
 
-        const title = document.createElement("h3");
-        title.textContent = group.category;
-        section.appendChild(title);
+          const title = document.createElement("h3");
+          title.textContent = group.category;
+          section.appendChild(title);
 
-        group.scraps.forEach(news => {
-          const article = document.createElement("div");
-          article.className = "news-card";
-          article.innerHTML = `
-            <a href="CardDetail.html" class="news-link" data-news-id="${news.newsId}">
-              <img src="${news.imageUrl || 'assets/news1.png'}" alt="뉴스 이미지" />
-              <div class="news-title">${news.title}</div>
-            </a>
-          `;
-          section.appendChild(article);
+          group.scraps.forEach(news => {
+            const article = document.createElement("div");
+            article.className = "news-card";
+            article.innerHTML = `
+              <a href="CardDetail.html" class="news-link" data-news-id="${news.newsId}">
+                <img src="${news.imageUrl || 'assets/news1.png'}" alt="뉴스 이미지" />
+                <div class="news-title">${news.title}</div>
+              </a>
+            `;
+            section.appendChild(article);
+          });
+
+          scrapContainer.appendChild(section);
         });
 
-        scrapContainer.appendChild(section);
+        // 📊 클릭 수 통계 그래프 생성
+        const clickRes = await fetch("http://localhost:8080/api/news/click-count/user", {
+          headers: { "Authorization": `Bearer ${token}` }
+        });
+        const clickData = await clickRes.json();
+        const labels = Object.keys(clickData);
+        const counts = Object.values(clickData);
+
+        new Chart(document.getElementById("clickChart"), {
+        type: 'doughnut',
+        data: {
+          labels: labels,
+          datasets: [{
+            data: counts,
+            backgroundColor: ['#FF6384', '#36A2EB', '#FFCE56', '#9CCC65', '#FFA726', '#BA68C8'],
+          }]
+        },
+        options: {
+          responsive: true,
+          plugins: {
+            legend: {
+              position: 'bottom',
+            },
+            title: {
+              display: true,
+              text: '카테고리별 클릭 수 통계'
+            },
+            datalabels: {
+              formatter: (value, context) => {
+                const total = context.chart.data.datasets[0].data.reduce((a, b) => a + b, 0);
+                const percent = ((value / total) * 100).toFixed(1);
+                return `${percent}%`;
+              },
+              color: '#333',
+              font: {
+                weight: 'bold'
+              }
+            }
+          }
+        },
+        plugins: [ChartDataLabels] // 플러그인 활성화
       });
+
 
       } catch (err) {
         console.error("유저 정보 불러오기 실패:", err);
@@ -167,12 +215,9 @@
         modal.classList.remove("hidden");
         try {
           const res = await fetch("http://localhost:8080/api/users/me", {
-            headers: {
-              "Authorization": `Bearer ${token}`
-            }
+            headers: { "Authorization": `Bearer ${token}` }
           });
           const user = await res.json();
-          
           const checks = document.querySelectorAll("#categoryCheckboxes input");
           checks.forEach(chk => chk.checked = user.interestCategories.includes(chk.value));
         } catch (err) {
@@ -190,7 +235,7 @@
       const token = localStorage.getItem("token");
 
       const updated = {
-        style: document.getElementById("style").value,
+        style: document.getElementById("style")?.value || "",
         interestCategories: Array.from(document.querySelectorAll("#categoryCheckboxes input:checked")).map(c => c.value)
       };
 
@@ -215,15 +260,16 @@
         console.error("수정 오류", err);
       }
     });
+
     // 마이페이지 카드 클릭 시 뉴스 ID 저장
     document.getElementById("scrapContainer").addEventListener("click", (e) => {
       const link = e.target.closest(".news-link");
       if (link) {
         const newsId = link.dataset.newsId;
         localStorage.setItem("selectedNewsId", newsId);
+        console.log("클릭한 뉴스 ID 저장됨:", newsId);
       }
     });
-
   </script>
 </body>
 </html>

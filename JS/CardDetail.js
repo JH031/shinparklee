@@ -1,9 +1,10 @@
 document.addEventListener("DOMContentLoaded", async function () {
   const container = document.getElementById("newsDetailContainer");
   const newsId = localStorage.getItem("selectedNewsId");
+  console.log("newsId:", newsId); // 디버깅용 로그
   const token = localStorage.getItem("token");
 
-  if (!newsId) {
+  if (!newsId || newsId === "undefined") {
     container.innerHTML = "<p>선택된 뉴스가 없습니다.</p>";
     return;
   }
@@ -13,9 +14,22 @@ document.addEventListener("DOMContentLoaded", async function () {
 
   try {
     // 기본 요약 불러오기
-    const res = await fetch("http://localhost:8080/api/summary/basic");
-    const data = await res.json();
-    item = data.find(news => news.newsId === newsId);
+    //const res = await fetch("http://localhost:8080/api/summary/basic");
+    //const data = await res.json();
+    //item = data.find(news => news.newsId === newsId);
+
+    // 아래처럼 대체
+    const res = await fetch(`http://localhost:8080/api/summary/detail/${newsId}`, {
+      headers: token ? { "Authorization": `Bearer ${token}` } : {}
+    });
+
+    if (!res.ok) {
+      container.innerHTML = "<p>뉴스 정보를 불러오는 데 실패했습니다.</p>";
+      return;
+    }
+    item = await res.json();
+
+
 
     if (!item) {
       container.innerHTML = "<p>뉴스 정보를 찾을 수 없습니다.</p>";

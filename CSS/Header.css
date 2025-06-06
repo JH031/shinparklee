@@ -1,46 +1,80 @@
-/* CSS/Header.css */
-
+/* ========================= */
+/* Header Layout & Styling  */
+/* ========================= */
 header {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  padding: 20px 0;
-  border-bottom: 1px solid #ccc;
-  background-color: #fff;
-}
-.header-nav a {
-  margin: 0 10px;
-  text-decoration: none;
-  color: black;
-  
+  padding: 16px 40px;
+  background-color: #223F5A; /* 딥블루 */
+  color: white;
 }
 
-.header-nav a:hover {
-  text-decoration: underline;
+/* 좌측: 로고 아이콘 + 텍스트 */
+.left-section {
+  display: flex;
+  align-items: center;
+  gap: 10px;
 }
 
+.logo-icon {
+  width: 40px;
+  height: 40px;
+}
 
+.logo-text {
+  font-size: 22px;
+  font-weight: bold;
+  color: white;
+}
+
+/* 네비게이션 */
 .nav-links {
   display: flex;
-  gap: 20px;
+  gap: 30px;
 }
 
 .nav-links a {
   text-decoration: none;
-  color: black;
-  font-size: 18px;
+  color: #F1FAEE;
+  font-size: 16px;
+  transition: color 0.3s;
+}
+
+.nav-links a:hover {
+  color: #E63946; /* 빨간 포인트 */
+}
+
+/* 우측: 검색 + 로그인 */
+.right-section {
+  display: flex;
+  align-items: center;
+  gap: 15px;
 }
 
 .search-icon {
   font-size: 20px;
-  margin-left: 15px;
-  display: inline-block;
+  cursor: pointer;
+  color: #F1FAEE;
 }
 
 #welcomeText {
   font-size: 14px;
-  color: black;
+  font-weight: bold;
+  color: #F1FAEE;
   white-space: nowrap;
+}
+
+#loginBtn {
+  padding: 6px 12px;
+  background-color: #E63946;
+  color: white;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
   font-weight: bold;
 }
 
+#loginBtn:hover {
+  background-color: #d62828;
+}
