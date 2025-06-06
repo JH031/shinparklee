@@ -8,11 +8,7 @@ import spl.demo.dto.CardDto;
 import spl.demo.dto.NewsDto;
 import spl.demo.dto.SummaryNewsDto;
 import spl.demo.entity.*;
-import spl.demo.repository.NewsRepository;
-import spl.demo.repository.StyleSummaryRepository;
-import spl.demo.repository.SummaryRepository;
-import spl.demo.repository.SignupRepository;
-import spl.demo.repository.ScrapRepository;
+import spl.demo.repository.*;
 
 import java.time.LocalDateTime;
 import java.util.*;
@@ -29,6 +25,7 @@ public class NewsService {
     private final GeminiService geminiService;
     private final SignupRepository signupRepository;
     private final ScrapRepository scrapRepository;
+    private final UserCategoryClickRepository userCategoryClickRepository;
 
     public void saveNewsIfNotExists(NewsDto dto) {
         if (!newsRepository.existsByNewsId(dto.getNewsId())) {
@@ -198,6 +195,32 @@ public class NewsService {
                     return dto;
                 })
                 .toList();
+    }
+    @Transactional
+    public void handleUserClick(String newsId, SignupEntity user) {
+        NewsEntity news = newsRepository.findByNewsId(newsId)
+                .orElseThrow(() -> new RuntimeException("뉴스 없음"));
+
+        InterestCategoryEntity category = news.getCategory();
+
+        UserCategoryClick click = userCategoryClickRepository.findByUserAndCategory(user, category)
+                .orElseGet(() -> {
+                    UserCategoryClick newClick = new UserCategoryClick();
+                    newClick.setUser(user);
+                    newClick.setCategory(category);
+                    return userCategoryClickRepository.save(newClick);
+                });
+
+        click.increment();
+    }
+
+    @Transactional(readOnly = true)
+    public Map<String, Long> getClickCountsByUser(SignupEntity user) {
+        return userCategoryClickRepository.findAllByUser(user).stream()
+                .collect(Collectors.toMap(
+                        c -> c.getCategory().name(),
+                        UserCategoryClick::getClickCount
+                ));
     }
 
 }

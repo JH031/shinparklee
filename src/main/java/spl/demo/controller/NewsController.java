@@ -1,6 +1,7 @@
 package spl.demo.controller;
 
 import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
@@ -10,10 +11,12 @@ import spl.demo.dto.CardDto;
 import spl.demo.dto.SummaryNewsDto;
 import spl.demo.entity.InterestCategoryEntity;
 import spl.demo.entity.NewsEntity;
+import spl.demo.entity.SignupEntity;
 import spl.demo.security.CustomUserDetails;
 import spl.demo.service.NewsService;
 
 import java.util.List;
+import java.util.Map;
 
 @RestController
 @RequestMapping("/api/news")
@@ -115,4 +118,29 @@ public class NewsController {
         return ResponseEntity.ok(newsService.getAllNewsWithScrapStatus(userId));
     }
 
+    @Operation(summary = "뉴스 클릭")
+    @PostMapping("/click/{newsId}")
+    public ResponseEntity<Void> clickNews(
+            @PathVariable(name = "newsId") String newsId,
+            @AuthenticationPrincipal CustomUserDetails userDetails) {
+
+        if (userDetails != null) {
+            SignupEntity user = userDetails.getUser();
+            newsService.handleUserClick(newsId, user);
+        }
+        return ResponseEntity.ok().build();
+    }
+
+    @Operation(summary = "유저별 클릭 수 조회")
+    @GetMapping("/click-count/user")
+    public ResponseEntity<Map<String, Long>> getUserClickCounts(
+            @AuthenticationPrincipal CustomUserDetails userDetails) {
+
+        if (userDetails == null) {
+            return ResponseEntity.badRequest().build(); // 로그인 필요
+        }
+
+        SignupEntity user = userDetails.getUser();
+        return ResponseEntity.ok(newsService.getClickCountsByUser(user));
+    }
 }
