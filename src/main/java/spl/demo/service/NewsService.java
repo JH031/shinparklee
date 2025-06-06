@@ -174,6 +174,7 @@ public class NewsService {
         return newsList.stream()
                 .map(news -> SummaryNewsDto.builder()
                         .id(news.getId())
+                        .newsId(news.getNewsId())
                         .title(news.getTitle())
                         .url(news.getUrl())
                         .createdAt(news.getCreatedAt())
