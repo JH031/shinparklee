@@ -7,9 +7,10 @@
   <link rel="stylesheet" href="CSS/Header.css" />
 </head>
 <body>
-  <div class="content">
-    <div id="header-container"></div>
+   <div id="header-container"></div>
 
+  <div class="content">
+   
     <div id="briefingContainer" class="briefing-container"></div>
 
     <hr class="section-divider" />
@@ -48,7 +49,7 @@
             if (loginBtn) loginBtn.style.display = "none";
             if (welcomeText) {
               welcomeText.style.display = "inline-block";
-              welcomeText.textContent = `${storedUserId}님 반가워요!`;
+              welcomeText.textContent = `${storedUserId}님`;
               welcomeText.style.fontWeight = "bold";
             }
           } else {
@@ -320,14 +321,30 @@
             return;
           }
 
-          const { title, imageUrl } = item;
+          const { title, imageUrl, newsId } = item;
           const image = imageUrl || 'assets/news1.png';
 
           card.innerHTML = `
-  <img src="${image}" alt="뉴스 이미지"
-       style="width:100%; object-fit:cover; border-radius:10px;" />
-  <h3>${title}</h3>
-`;
+          <img src="${image}" alt="뉴스 이미지"
+              style="width:100%; object-fit:cover; border-radius:10px;" />
+          <h3>${title}</h3>
+        `;
+          card.onclick = async () => {
+            localStorage.setItem("selectedNewsId", newsId);
+
+            const token = localStorage.getItem("token");
+            if (token) {
+              await fetch(`http://localhost:8080/api/news/click/${newsId}`, {
+                method: "POST",
+                headers: {
+                  "Authorization": `Bearer ${token}`
+                }
+              });
+            }
+
+            location.href = "CardDetail.html";
+          };
+
           renderProgress();
         }
 

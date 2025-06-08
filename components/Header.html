@@ -1,23 +1,25 @@
 <header>
-  <div class="left-section">
-    <a href="Home.html"><img src="assets/news_logo.png" alt="NEWSCENES 로고" class="logo-icon" /></a>
-    <div class="logo-text">NEWSCENES</div>
-  </div>
-  <nav class="nav-links">
-    <!-- <a href="Home.html" id="home-link">Home</a> -->
-    <a href="#" data-category="Politics">정치</a>
-    <a href="#" data-category="Economy">경제</a>
-    <a href="#" data-category="Society">사회</a>
-    <a href="#" data-category="ITScience">IT/과학</a>
-    <a href="#" data-category="LifestyleCulture">생활/문화</a>
-    <a href="#" data-category="Entertainment">연예</a>
-    <a href="mypage.html" class="user_icon"><img src="../assets/user.png" alt="마이페이지" width="20px"></a>
-  </nav> 
-  
-  <div class="right-section">
-    <div class="search-icon"><img src="../assets/search.png" alt="검색" width="18px"></div>
-    <span id="welcomeText" style="display: none;"></span>
-    <button id="loginBtn">Login</button>
+  <div class="header-inner">
+    <div class="left-section">
+      <a href="Home.html" class="logo-link" style="display: flex; align-items: center; gap: 10px;">
+        <img src="assets/news_logo.png" alt="로고" class="logo-icon">
+        <span class="logo-text">NEWSCENES</span>
+      </a>
+    </div>
+    <nav class="nav-links">
+      <a href="#" data-category="Politics">정치</a>
+      <a href="#" data-category="Economy">경제</a>
+      <a href="#" data-category="Society">사회</a>
+      <a href="#" data-category="ITScience">IT/과학</a>
+      <a href="#" data-category="LifestyleCulture">생활/문화</a>
+      <a href="#" data-category="Entertainment">연예</a>
+    </nav> 
+    <div class="right-section">
+      <div class="search-icon"><img src="../assets/search.png" alt="검색" width="20px"></div>
+        <a href="mypage.html" class="user_icon"><img src="../assets/user.png" alt="마이페이지" width="20px"></a>
+      <span id="welcomeText" style="display: none;"></span>
+      <button id="loginBtn">Login</button>
+    </div>
   </div>
 </header>
 
@@ -35,7 +37,7 @@
     if (isLoggedIn && storedUserId) {
       loginBtn.style.display = 'none';
       welcomeText.style.display = 'inline-block';
-      welcomeText.textContent = `${storedUserId}님 반갑습니다!`;
+      welcomeText.textContent = `${storedUserId}님`;
     } else {
       loginBtn.style.display = 'inline-block';
       welcomeText.style.display = 'none';

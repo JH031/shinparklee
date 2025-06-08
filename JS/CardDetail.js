@@ -78,8 +78,12 @@ document.addEventListener("DOMContentLoaded", async function () {
       </div>
       <p id="summaryText" class="news-detail-summary">${styledSummaries["DEFAULT"]}</p>
       <a href="${url}" target="_blank" class="news-detail-link">원문 보기</a>
+      <button id="backButton" class="back-button">← 뒤로가기</button>
     </div>
   `;
+  document.getElementById("backButton").addEventListener("click", () => {
+  window.history.back();
+});
 
 
     // 스크랩 기능
@@ -133,3 +137,4 @@ document.addEventListener("DOMContentLoaded", async function () {
     container.innerHTML = "<p>뉴스 정보를 불러오는 중 오류가 발생했습니다.</p>";
   }
 });
+
