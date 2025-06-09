@@ -10,15 +10,12 @@
 <body>
   <div id="header-container"></div>
   <div class="content">
-    <!-- 검색 입력창 -->
     <div class="search-section">
       <div class="search-box">
         <input type="text" id="keywordInput" placeholder="궁금한 뉴스를 검색해보세요" />
         <button id="searchBtn">🔍</button>
       </div>
     </div>
-
-    <!-- 최근 검색어 -->
     <div class="recent-search">
       <div class="recent-header">
         <span>최근 검색어</span>
@@ -27,24 +24,20 @@
       <div id="recentList" class="recent-keywords"></div>
     </div>
 
-    <!-- 검색 결과 -->
     <div id="searchResults" class="results-container"></div>
   </div>
   <div id="footer-container"></div>
 
   <script type="module">
     document.addEventListener("DOMContentLoaded", async () => {
-      // ✅ Header 삽입
       const headerRes = await fetch("components/Header.html");
       const headerHTML = await headerRes.text();
       document.getElementById("header-container").innerHTML = headerHTML;
 
-      // ✅ Footer 삽입
       const footerRes = await fetch("components/Footer.html");
       const footerHTML = await footerRes.text();
       document.getElementById("footer-container").innerHTML = footerHTML;
 
-      // ✅ 로그인 상태 처리
       const loginBtn = document.getElementById("loginBtn");
       const welcomeText = document.getElementById("welcomeText");
       const token = localStorage.getItem("token");
@@ -68,7 +61,6 @@
             if (welcomeText) welcomeText.style.display = "none";
           }
         } catch (err) {
-          console.error("🚫 로그인 상태 확인 실패", err);
         }
       } else {
         if (loginBtn) loginBtn.style.display = "inline-block";

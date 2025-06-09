@@ -1,7 +1,7 @@
 document.addEventListener("DOMContentLoaded", async function () {
   const container = document.getElementById("newsDetailContainer");
   const newsId = localStorage.getItem("selectedNewsId");
-  console.log("newsId:", newsId); // 디버깅용 로그
+  console.log("newsId:", newsId); 
   const token = localStorage.getItem("token");
 
   if (!newsId || newsId === "undefined") {
@@ -34,7 +34,6 @@ document.addEventListener("DOMContentLoaded", async function () {
     const { title, url, imageUrl, createdAt, summaries = {} } = item;
     styledSummaries["DEFAULT"] = summaries["DEFAULT"] || "(요약 없음)";
 
-    // 스크랩 상태 확인
     let isScrapped = false;
     let starIcon = "assets/emptyscrap.png";
 
@@ -54,7 +53,6 @@ document.addEventListener("DOMContentLoaded", async function () {
       }
     }
 
-    // 상세 내용 출력
     container.innerHTML = `
     <div class="news-detail-card">
       <img src="${imageUrl || 'assets/news1.png'}" alt="뉴스 이미지" class="news-detail-image" />
@@ -80,14 +78,11 @@ document.addEventListener("DOMContentLoaded", async function () {
   window.history.back();
 });
 
-
-    // 스크랩 기능
     document.getElementById("scrapIcon").addEventListener("click", async () => {
     if (!token) return alert("로그인 후 스크랩할 수 있습니다.");
 
     try {
       if (isScrapped) {
-        // 이미 스크랩된 상태 → 스크랩 취소
         const res = await fetch(`http://localhost:8080/api/scrap/${newsId}`, {
           method: "DELETE",
           headers: { "Authorization": `Bearer ${token}` }
@@ -99,7 +94,6 @@ document.addEventListener("DOMContentLoaded", async function () {
         } else {
         }
       } else {
-        // 스크랩 안 된 상태 → 스크랩 추가
         const res = await fetch(`http://localhost:8080/api/scrap/${newsId}`, {
           method: "POST",
           headers: { "Authorization": `Bearer ${token}` }
@@ -116,8 +110,6 @@ document.addEventListener("DOMContentLoaded", async function () {
     }
   });
 
-
-    // 드롭다운 변경 시 자동 변환
     document.getElementById("styleSelect").addEventListener("change", async (e) => {
       const selectedStyle = e.target.value;
       const summaryTextElem = document.getElementById("summaryText");

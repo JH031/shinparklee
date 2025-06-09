@@ -15,14 +15,14 @@ document.getElementById("loginForm").addEventListener("submit", function(e) {
   })
 })
 .then(async res => {
-  const result = await res.json(); // <-- 토큰 있는 JSON 응답 받기
+  const result = await res.json(); 
   if (!res.ok) {
     throw new Error(result.message || "로그인 실패");
   }
 
   const token = result.token;
-  console.log("✅ 토큰:", token);
-  localStorage.setItem('token', token); // 저장
+  console.log(" 토큰:", token);
+  localStorage.setItem('token', token); 
   localStorage.setItem('isLoggedIn', 'true');
   localStorage.setItem('userId', userId);
 

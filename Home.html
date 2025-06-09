@@ -35,17 +35,14 @@
     const newsContainer = document.getElementById('newsContainer');
     let newsTitles = [];
 
-    // ✅ 헤더 삽입
     const headerRes = await fetch("components/Header.html");
     const headerHTML = await headerRes.text();
     document.getElementById("header-container").innerHTML = headerHTML;
 
-    // ✅ Footer 삽입
     const footerRes = await fetch("components/Footer.html");
     const footerHTML = await footerRes.text();
     document.getElementById("footer-container").innerHTML = footerHTML;
 
-    // ✅ 삽입 후 요소 참조
     const loginBtn = document.getElementById("loginBtn");
     const welcomeText = document.getElementById("welcomeText");
     const token = localStorage.getItem("token");

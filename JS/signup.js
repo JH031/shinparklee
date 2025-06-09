@@ -2,7 +2,6 @@
 document.getElementById("signupForm").addEventListener("submit", async function(e) {
   e.preventDefault();
 
-  // 선택된 카테고리 추출
   const categories = [...document.querySelectorAll(".category-tag")]
     .map(tag => tag.firstChild.textContent.trim());
 
@@ -12,7 +11,7 @@ document.getElementById("signupForm").addEventListener("submit", async function(
     password: document.getElementById("password").value,
     confirmPassword: document.getElementById("confirm").value,
     email: document.getElementById("email").value,
-    interestCategories: categories, // 리스트로 보냄
+    interestCategories: categories, 
   };
 
   try {
@@ -23,7 +22,6 @@ document.getElementById("signupForm").addEventListener("submit", async function(
     });
 
     if (response.ok) {
-  // 🌟 카테고리도 localStorage에 저장
     localStorage.setItem('isLoggedIn', 'true');
     localStorage.setItem('userId', dto.userId);
     localStorage.setItem('interestCategories', JSON.stringify(dto.interestCategories));
@@ -79,7 +77,6 @@ document.addEventListener("DOMContentLoaded", () => {
   categorySelect.addEventListener("change", () => {
     const selectedValue = categorySelect.value;
 
-    // 이미 선택된 항목이면 추가하지 않음
     if (selectedSet.has(selectedValue)) return;
 
     selectedSet.add(selectedValue);
@@ -91,15 +88,12 @@ document.addEventListener("DOMContentLoaded", () => {
       <button class="remove-btn" type="button">✕</button>
     `;
 
-    // X버튼 클릭 시 삭제
     tag.querySelector(".remove-btn").addEventListener("click", () => {
       selectedDiv.removeChild(tag);
       selectedSet.delete(selectedValue);
     });
 
     selectedDiv.appendChild(tag);
-
-    // 다시 초기 상태로 변경 (옵션 텍스트로)
     categorySelect.selectedIndex = 0;
   });
 });

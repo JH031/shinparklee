@@ -1,14 +1,11 @@
-/* ====================== */
-/* 회원가입 페이지 스타일 */
-/* ====================== */
 .signup-layout {
   display: flex;
   align-items: flex-start;
-  justify-content: center; /* 수평 가운데 정렬 */
+  justify-content: center; 
   gap: 40px;
   max-width: 1000px;
-  margin: 0 auto; /* 좌우 여백 자동으로 가운데 배치 */
-  padding: 50px 20px; /* 위아래 여백 추가 (선택사항) */
+  margin: 0 auto; 
+  padding: 50px 20px; 
 }
 
 .news-logo {
@@ -123,9 +120,6 @@ label {
   margin-bottom: 15px;
 }
 
-/* ====================== */
-/* 공통 입력 요소 스타일  */
-/* ====================== */
 input[type="text"],
 input[type="password"],
 input[type="email"],

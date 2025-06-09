@@ -1,6 +1,3 @@
-/* ============================== */
-/* 공통 스타일 (전체 페이지 공통) */
-/* ============================== */
 body {
   font-family: Arial, sans-serif;
   margin: 0;
@@ -36,9 +33,6 @@ a {
   text-decoration: none;
 }
 
-/* ================= */
-/* HOME 페이지 스타일 */
-/* ================= */
 header {
   display: flex;
   justify-content: space-between;
@@ -95,8 +89,8 @@ header {
 }
 
 .news-card {
-  width: 260px; /* ✅ 고정 크기 */
-  height: 200px; /* 필요 시 높이도 고정 */
+  width: 260px; 
+  height: 200px; 
   display: flex;
   flex-direction: column;
   padding: 16px;
@@ -126,12 +120,12 @@ header {
   line-height: 1.4;
   padding-top: 8px;
 
-  white-space: normal;       /* ✅ 줄바꿈 허용 */
+  white-space: normal;       
   overflow: hidden;
   text-overflow: ellipsis;
   display: -webkit-box;
-  -webkit-line-clamp: 2;      /* ✅ 최대 2줄까지 표시 */
-  line-clamp: 2;              /* ✅ 표준 속성 추가 */
+  -webkit-line-clamp: 2;      
+  line-clamp: 2;             
   -webkit-box-orient: vertical;
 }
 
@@ -160,7 +154,6 @@ header {
   object-fit: cover;
   margin-right: 15px;
 }
-/* CSS/styles.css 내에 추가 */
 .news-detail-card {
   max-width: 600px;
   margin: 30px auto;
