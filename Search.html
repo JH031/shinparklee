@@ -7,75 +7,84 @@
   <link rel="stylesheet" href="CSS/Header.css" />
 </head>
 <body>
-    <div class="content">
-  <!-- 헤더 -->
   <div id="header-container"></div>
-
-  <!-- 검색 입력창 -->
-  <div class="search-section">
-    <div class="search-box">
-      <input type="text" id="keywordInput" placeholder="궁금한 지식과 뉴시커를 찾아보세요" />
-      <button id="searchBtn">🔍</button>
+  <div class="content">
+    <!-- 검색 입력창 -->
+    <div class="search-section">
+      <div class="search-box">
+        <input type="text" id="keywordInput" placeholder="궁금한 지식과 뉴시커를 찾아보세요" />
+        <button id="searchBtn">🔍</button>
+      </div>
     </div>
-  </div>
 
-  <!-- 최근 검색어 -->
-  <div class="recent-search">
-    <span>최근 검색어</span>
-    <button id="clearRecent">전체 삭제</button>
-    <ul id="recentList"></ul>
-  </div>
+    <!-- 최근 검색어 -->
+    <div class="recent-search">
+      <div class="recent-header">
+        <span>최근 검색어</span>
+        <button id="clearRecent">전체 삭제</button>
+      </div>
+      <div id="recentList" class="recent-keywords"></div>
+    </div>
 
-  <!-- 검색 결과 -->
-  <div id="searchResults" class="results-container"></div>
+    <!-- 검색 결과 -->
+    <div id="searchResults" class="results-container"></div>
+  </div>
 
   <script type="module">
     document.addEventListener("DOMContentLoaded", async () => {
       // ✅ Header 삽입
-      await fetch("components/Header.html")
-        .then(res => res.text())
-        .then(data => {
-          document.getElementById("header-container").innerHTML = data;
+      const headerRes = await fetch("components/Header.html");
+      const headerHTML = await headerRes.text();
+      document.getElementById("header-container").innerHTML = headerHTML;
 
-          // ✅ 돋보기 아이콘 클릭 시 Search.html 이동
-          document.querySelector('.search-icon')?.addEventListener('click', () => {
-            location.href = 'Search.html';
+      // ✅ 로그인 상태 처리
+      const loginBtn = document.getElementById("loginBtn");
+      const welcomeText = document.getElementById("welcomeText");
+      const token = localStorage.getItem("token");
+
+      if (token) {
+        try {
+          const res = await fetch("http://localhost:8080/api/users/me", {
+            headers: { Authorization: `Bearer ${token}` }
           });
 
-          // ✅ 로그인 상태 처리
-          const loginBtn = document.getElementById("loginBtn");
-          const welcomeText = document.getElementById("welcomeText");
-          const storedUserId = localStorage.getItem("userId");
-          const isLoggedIn = localStorage.getItem("isLoggedIn") === "true";
-
-          if (isLoggedIn && storedUserId) {
+          if (res.ok) {
+            const user = await res.json();
             if (loginBtn) loginBtn.style.display = "none";
             if (welcomeText) {
               welcomeText.style.display = "inline-block";
-              welcomeText.textContent = `${storedUserId}님 반가워요!`;
+              welcomeText.textContent = `${user.userId}님 반가워요!`;
               welcomeText.style.fontWeight = "bold";
             }
           } else {
-            if (loginBtn) {
-              loginBtn.style.display = "inline-block";
-              loginBtn.textContent = "Login";
-              loginBtn.onclick = () => location.href = "login.html";
-            }
+            if (loginBtn) loginBtn.style.display = "inline-block";
             if (welcomeText) welcomeText.style.display = "none";
           }
+        } catch (err) {
+          console.error("🚫 로그인 상태 확인 실패", err);
+        }
+      } else {
+        if (loginBtn) loginBtn.style.display = "inline-block";
+        if (welcomeText) welcomeText.style.display = "none";
+      }
 
-          // ✅ 카테고리 클릭 시 Home.html로 이동 + localStorage 저장
-          document.querySelectorAll(".nav-links a[data-category]").forEach(link => {
-            link.addEventListener("click", function (e) {
-              e.preventDefault();
-              const category = this.getAttribute("data-category");
-              localStorage.setItem("selectedCategory", category);
-              location.href = "Home.html";
-            });
-          });
+      if (loginBtn) {
+        loginBtn.onclick = () => location.href = "login.html";
+      }
+
+      document.querySelector('.search-icon')?.addEventListener('click', () => {
+        location.href = 'Search.html';
+      });
+
+      document.querySelectorAll(".nav-links a[data-category]").forEach(link => {
+        link.addEventListener("click", function (e) {
+          e.preventDefault();
+          const category = this.getAttribute("data-category");
+          localStorage.setItem("selectedCategory", category);
+          location.href = "Home.html";
         });
+      });
 
-      // ✅ 검색 로직 초기화
       initSearch();
     });
 
@@ -86,7 +95,6 @@
       const recentList = document.getElementById("recentList");
       const clearBtn = document.getElementById("clearRecent");
 
-      // 최근 검색어 렌더링
       loadRecentSearches();
 
       button.addEventListener("click", search);
@@ -100,24 +108,40 @@
       });
 
       function loadRecentSearches() {
-        const recent = JSON.parse(localStorage.getItem("recentSearches") || "[]");
-        recentList.innerHTML = "";
-        recent.forEach(keyword => {
-          const li = document.createElement("li");
-          li.textContent = keyword;
-          li.addEventListener("click", () => {
-            input.value = keyword;
-            search();
-          });
-          recentList.appendChild(li);
-        });
-      }
+  const recent = JSON.parse(localStorage.getItem("recentSearches") || "[]");
+  recentList.innerHTML = "";
+
+  recent.forEach(keyword => {
+    const tag = document.createElement("div");
+    tag.className = "keyword-tag";
+    tag.innerHTML = `
+      <span>${keyword}</span>
+      <button class="remove-btn" title="삭제">×</button>
+    `;
+
+    // ✅ 키워드 클릭 시 검색 실행
+    tag.querySelector("span").addEventListener("click", () => {
+      input.value = keyword;
+      search();
+    });
+
+    // ✅ [삭제 버튼] 클릭 시 해당 키워드 삭제
+    tag.querySelector("button").addEventListener("click", () => {
+      const updated = recent.filter(k => k !== keyword); // 제외한 배열 새로 생성
+      localStorage.setItem("recentSearches", JSON.stringify(updated)); // 업데이트
+      loadRecentSearches(); // 다시 렌더링
+    });
+
+    recentList.appendChild(tag);
+  });
+}
+
 
       async function search() {
         const keyword = input.value.trim();
+        results.innerHTML = "";
         if (!keyword) return;
 
-        // 최근 검색어 저장
         let recent = JSON.parse(localStorage.getItem("recentSearches") || "[]");
         recent = [keyword, ...recent.filter(k => k !== keyword)].slice(0, 5);
         localStorage.setItem("recentSearches", JSON.stringify(recent));
@@ -132,7 +156,6 @@
         });
 
         const data = await res.json();
-        results.innerHTML = "";
 
         if (!data || data.length === 0) {
           results.innerHTML = "<p class='no-result'>검색 결과가 없습니다.</p>";
@@ -155,6 +178,5 @@
       }
     }
   </script>
-  </div>
 </body>
 </html>

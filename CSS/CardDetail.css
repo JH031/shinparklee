@@ -44,5 +44,20 @@
 .right-controls {
   display: flex;
   align-items: center;
-  gap: 8px;
+  gap: 15px;
+}
+.back-button {
+  background-color: black;
+  color: white;
+  border: none;
+  border-radius: 8px;
+  padding: 8px 14px;
+  font-size: 14px;
+  font-weight: bold;
+  cursor: pointer;
+  margin-left: 10px;
+}
+
+.back-button:hover {
+  background-color: #333;
 }

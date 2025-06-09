@@ -13,12 +13,7 @@ document.addEventListener("DOMContentLoaded", async function () {
   let styledSummaries = {};
 
   try {
-    // 기본 요약 불러오기
-    //const res = await fetch("http://localhost:8080/api/summary/basic");
-    //const data = await res.json();
-    //item = data.find(news => news.newsId === newsId);
 
-    // 아래처럼 대체
     const res = await fetch(`http://localhost:8080/api/summary/detail/${newsId}`, {
       headers: token ? { "Authorization": `Bearer ${token}` } : {}
     });
@@ -41,7 +36,7 @@ document.addEventListener("DOMContentLoaded", async function () {
 
     // 스크랩 상태 확인
     let isScrapped = false;
-    let starIcon = "assets/emptystar.png";
+    let starIcon = "assets/emptyscrap.png";
 
     if (token) {
       try {
@@ -52,7 +47,7 @@ document.addEventListener("DOMContentLoaded", async function () {
           const allNews = await withScrapRes.json();
           const matchedNews = allNews.find(n => n.newsId === newsId);
           isScrapped = matchedNews?.scrapped === true;
-          starIcon = isScrapped ? "assets/fillstar.png" : "assets/emptystar.png";
+          starIcon = isScrapped ? "assets/fillscrap.png" : "assets/emptyscrap.png";
         }
       } catch (err) {
         console.warn("스크랩 확인 실패:", err);
@@ -68,7 +63,7 @@ document.addEventListener("DOMContentLoaded", async function () {
         <div class="right-controls" style="display: flex; align-items: center; gap: 20px;">
           <img id="scrapIcon" src="${starIcon}" alt="스크랩 아이콘" class="scrap-icon-inline" />
           <label for="styleSelect" style="white-space: nowrap;">말투 선택:</label>
-          <select id="styleSelect">
+          <select id="styleSelect" style="width: 120px; height: 30px; border-radius: 6px; padding: 0 10px; margin-top: 30px;">
             <option value="DEFAULT">기본</option>
             <option value="FUNNY">재미있게</option>
             <option value="SIMPLE">쉽게</option>
@@ -78,7 +73,7 @@ document.addEventListener("DOMContentLoaded", async function () {
       </div>
       <p id="summaryText" class="news-detail-summary">${styledSummaries["DEFAULT"]}</p>
       <a href="${url}" target="_blank" class="news-detail-link">원문 보기</a>
-      <button id="backButton" class="back-button">← 뒤로가기</button>
+      <button id="backButton" class="back-button" style="border-radius: 6px;" >뒤로가기</button>
     </div>
   `;
   document.getElementById("backButton").addEventListener("click", () => {

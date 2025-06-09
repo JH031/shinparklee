@@ -10,7 +10,7 @@
    <div id="header-container"></div>
 
   <div class="content">
-   
+
     <div id="briefingContainer" class="briefing-container"></div>
 
     <hr class="section-divider" />
@@ -24,90 +24,104 @@
   </div>
 
   <script type="module">
-    document.addEventListener('DOMContentLoaded', async function () {
-      const searchInput = document.querySelector('.search-box input');
-      const searchBtn = document.querySelector('.search-box button:first-of-type');
-      const categorySelect = document.getElementById('categorySelect');
-      const newsContainer = document.getElementById('newsContainer');
-      let newsTitles = [];
+   document.addEventListener('DOMContentLoaded', async function () {
+    const searchInput = document.querySelector('.search-box input');
+    const searchBtn = document.querySelector('.search-box button');
+    const categorySelect = document.getElementById('categorySelect');
+    const newsContainer = document.getElementById('newsContainer');
+    let newsTitles = [];
 
-      // ✅ 헤더 삽입 및 로그인 상태 처리
-      await fetch("components/Header.html")
-        .then(res => res.text())
-        .then(data => {
-          document.getElementById("header-container").innerHTML = data;
-          document.querySelector('.search-icon')?.addEventListener('click', () => {
-            location.href = 'Search.html';
-          });
+    // ✅ 헤더 삽입
+    const headerRes = await fetch("components/Header.html");
+    const headerHTML = await headerRes.text();
+    document.getElementById("header-container").innerHTML = headerHTML;
 
-          const loginBtn = document.getElementById("loginBtn");
-          const welcomeText = document.getElementById("welcomeText");
-          const storedUserId = localStorage.getItem("userId");
-          const isLoggedIn = localStorage.getItem("isLoggedIn") === "true";
+    // ✅ 삽입 후 요소 참조
+    const loginBtn = document.getElementById("loginBtn");
+    const welcomeText = document.getElementById("welcomeText");
+    const token = localStorage.getItem("token");
 
-          if (isLoggedIn && storedUserId) {
-            if (loginBtn) loginBtn.style.display = "none";
-            if (welcomeText) {
-              welcomeText.style.display = "inline-block";
-              welcomeText.textContent = `${storedUserId}님`;
-              welcomeText.style.fontWeight = "bold";
-            }
-          } else {
-            if (loginBtn) {
-              loginBtn.style.display = "inline-block";
-              loginBtn.textContent = "Login";
-              loginBtn.onclick = () => location.href = "login.html";
-            }
-            if (welcomeText) welcomeText.style.display = "none";
-          }
-
-          document.querySelectorAll(".nav-links a[data-category]").forEach(link => {
-            link.addEventListener("click", function (e) {
-              e.preventDefault();
-              const category = this.getAttribute("data-category");
-              localStorage.setItem("selectedCategory", category);
-              location.href = "Home.html";
-            });
-          });
-
-          handleCategoryFromHeader();
+    if (token) {
+      try {
+        const res = await fetch("http://localhost:8080/api/users/me", {
+          headers: { Authorization: `Bearer ${token}` }
         });
 
-      const selectedCategory = localStorage.getItem("selectedCategory");
-      const sectionDivider = document.querySelector(".section-divider");
-      const newsSectionTitle = document.querySelector(".news-section-title");
-
-      if (selectedCategory) {
-        categorySelect.value = selectedCategory;
-        document.getElementById("briefingContainer").style.display = "none";
-        if (sectionDivider) sectionDivider.style.display = "none";
-        if (newsSectionTitle) newsSectionTitle.style.display = "none";
-      } else {
-        document.getElementById("briefingContainer").style.display = "block";
-        fetch("http://localhost:8080/api/summary/hot")
-          .then(res => res.json())
-          .then(data => {
-            createBriefingCarousel("briefingContainer", data);
-          })
-          .catch(err => {
-            console.error("🔥 핫토픽 뉴스 불러오기 실패:", err);
-          });
+        if (res.ok) {
+          const user = await res.json();
+          if (loginBtn) loginBtn.style.display = "none";
+          if (welcomeText) {
+            welcomeText.style.display = "inline-block";
+            welcomeText.textContent = `${user.userId}님`;
+          }
+        } else {
+          if (loginBtn) loginBtn.style.display = "inline-block";
+          if (welcomeText) welcomeText.style.display = "none";
+        }
+      } catch (err) {
+        console.error("🚫 로그인 상태 확인 실패", err);
       }
+    } else {
+      if (loginBtn) loginBtn.style.display = "inline-block";
+      if (welcomeText) welcomeText.style.display = "none";
+    }
 
-      await buildCategoryOptions();
+    if (loginBtn) {
+      loginBtn.onclick = () => {
+        location.href = "login.html";
+      };
+    }
 
-      if (!selectedCategory) {
-        loadAllNews();
-      }
+    document.querySelector('.search-icon')?.addEventListener('click', () => {
+      location.href = 'Search.html';
+    });
 
-      searchBtn?.addEventListener('click', () => {
-        const keyword = searchInput.value.trim();
-        if (!keyword) return;
-        const filtered = newsTitles.filter(title => title.includes(keyword));
-        renderNews(filtered);
+    document.querySelectorAll(".nav-links a[data-category]").forEach(link => {
+      link.addEventListener("click", function (e) {
+        e.preventDefault();
+        const category = this.getAttribute("data-category");
+        localStorage.setItem("selectedCategory", category);
+        location.href = "Home.html";
       });
+    });
 
-      categorySelect.addEventListener('change', async () => {
+    handleCategoryFromHeader();
+
+    const selectedCategory = localStorage.getItem("selectedCategory");
+    const sectionDivider = document.querySelector(".section-divider");
+    const newsSectionTitle = document.querySelector(".news-section-title");
+
+    if (selectedCategory) {
+      categorySelect.value = selectedCategory;
+      document.getElementById("briefingContainer").style.display = "none";
+      if (sectionDivider) sectionDivider.style.display = "none";
+      if (newsSectionTitle) newsSectionTitle.style.display = "none";
+    } else {
+      document.getElementById("briefingContainer").style.display = "block";
+      fetch("http://localhost:8080/api/summary/hot")
+        .then(res => res.json())
+        .then(data => {
+          createBriefingCarousel("briefingContainer", data);
+        })
+        .catch(err => {
+          console.error("🔥 핫토픽 뉴스 불러오기 실패:", err);
+        });
+    }
+
+    await buildCategoryOptions();
+
+    if (!selectedCategory) {
+      loadAllNews();
+    }
+
+    searchBtn?.addEventListener('click', () => {
+      const keyword = searchInput.value.trim();
+      if (!keyword) return;
+      const filtered = newsTitles.filter(title => title.includes(keyword));
+      renderNews(filtered);
+    });
+
+    categorySelect.addEventListener('change', async () => {
       const selected = categorySelect.value;
       const sectionTitle = document.querySelector(".news-section-title");
       const sectionDivider = document.querySelector(".section-divider");
@@ -121,7 +135,7 @@
         newsContainer.innerHTML = '';
         newsContainer.classList.add('category-mode');
         if (sectionTitle) sectionTitle.style.display = 'none';
-         if (sectionDivider) sectionDivider.style.display = 'none';
+        if (sectionDivider) sectionDivider.style.display = 'none';
 
         const storedUserId = localStorage.getItem('userId');
         let categories = JSON.parse(localStorage.getItem('interestCategories') || '[]');
@@ -143,8 +157,7 @@
       }
     });
 
-
-      function loadAllNews() {
+    function loadAllNews() {
       const sectionTitle = document.querySelector(".news-section-title");
       if (sectionTitle) sectionTitle.style.display = 'block';
       newsContainer.classList.remove('category-mode');
@@ -158,22 +171,21 @@
         .catch(err => console.error('전체 뉴스 로딩 실패:', err));
     }
 
+    function renderNews(titleList) {
+      newsContainer.innerHTML = '';
+      titleList.forEach(news => {
+        const card = document.createElement('div');
+        card.className = 'news-card';
+        const imageUrl = news.imageUrl || 'assets/news1.png';
+        card.innerHTML = `
+          <img src="${imageUrl}" alt="뉴스 썸네일" class="news-thumbnail" />
+          <div class="news-text">
+            <div class="news-title">${news.title}</div>
+          </div>
+        `;
+        newsContainer.appendChild(card);
 
-      function renderNews(titleList) {
-        newsContainer.innerHTML = '';
-        titleList.forEach(news => {
-          const card = document.createElement('div');
-          card.className = 'news-card';
-          const imageUrl = news.imageUrl || 'assets/news1.png';
-          card.innerHTML = `
-            <img src="${imageUrl}" alt="뉴스 썸네일" class="news-thumbnail" />
-            <div class="news-text">
-              <div class="news-title">${news.title}</div>
-            </div>
-          `;
-          newsContainer.appendChild(card);
-
-          card.addEventListener("click", async () => {
+        card.addEventListener("click", async () => {
           const newsId = news.newsId;
           localStorage.setItem("selectedNewsId", newsId);
 
@@ -186,189 +198,187 @@
               }
             });
           }
-            location.href = "CardDetail.html";
-          });
+          location.href = "CardDetail.html";
         });
-      }
+      });
+    }
 
-      function renderCategorySection(categoryCode, newsList) {
-        const translated = translateCategory(categoryCode);
-        const sectionTitle = document.createElement('h3');
-        sectionTitle.textContent = `📌 ${translated}`;
-        sectionTitle.style.marginTop = '30px';
-        sectionTitle.style.borderTop = '1px solid #ccc';
-        sectionTitle.style.paddingTop = '20px';
+    function renderCategorySection(categoryCode, newsList) {
+      const translated = translateCategory(categoryCode);
+      const sectionTitle = document.createElement('h3');
+      sectionTitle.textContent = `📌 ${translated}`;
+      sectionTitle.style.marginTop = '30px';
+      sectionTitle.style.borderTop = '1px solid #ccc';
+      sectionTitle.style.paddingTop = '20px';
 
-        newsContainer.appendChild(sectionTitle);
+      newsContainer.appendChild(sectionTitle);
 
-        const sectionGroup = document.createElement('div');
-        sectionGroup.className = 'category-news-group';
+      const sectionGroup = document.createElement('div');
+      sectionGroup.className = 'category-news-group';
 
-        newsList.forEach(news => {
-          const card = document.createElement('div');
-          card.className = 'news-card';
-          const imageUrl = news.imageUrl || 'assets/news1.png';
-          card.innerHTML = `
-            <img src="${imageUrl}" alt="뉴스 썸네일" class="news-thumbnail" />
-            <div class="news-text">
-              <div class="news-title">${news.title}</div>
-            </div>
-          `;
-          card.addEventListener("click", () => {
-            localStorage.setItem("selectedNewsId", news.newsId);
-            location.href = "CardDetail.html";
-          });
-          sectionGroup.appendChild(card);
-        });
-
-        newsContainer.appendChild(sectionGroup);
-      }
-
-      function handleCategoryFromHeader() {
-        const selected = localStorage.getItem("selectedCategory");
-        if (selected) {
-          document.getElementById("briefingContainer").style.display = "none";
-          fetch(`http://localhost:8080/api/news/card?category=${selected}`)
-            .then(res => res.json())
-            .then(data => {
-              newsTitles = data;
-              renderNews(newsTitles);
-              localStorage.removeItem("selectedCategory");
-            })
-            .catch(err => console.error('선택 카테고리 뉴스 로딩 실패:', err));
-        }
-      }
-
-      async function buildCategoryOptions() {
-        const storedUserId = localStorage.getItem('userId');
-        let categories = JSON.parse(localStorage.getItem('interestCategories') || '[]');
-
-        if (categories.length === 0 && storedUserId) {
-          categories = await fetchUserCategories(storedUserId);
-          localStorage.setItem('interestCategories', JSON.stringify(categories));
-        }
-
-        categorySelect.innerHTML = '';
-        const allOption = new Option('모든 뉴스', 'ALL');
-        allOption.selected = true;
-        categorySelect.appendChild(allOption);
-
-        categorySelect.appendChild(new Option('내 관심 카테고리', 'MY'));
-      }
-
-      async function fetchUserCategories(userId) {
-        try {
-          const res = await fetch(`http://localhost:8080/api/signup/preferences/${userId}`);
-          return await res.json();
-        } catch (err) {
-          console.error("카테고리 불러오기 실패", err);
-          return [];
-        }
-      }
-
-      function translateCategory(code) {
-        const map = {
-          Politics: "정치",
-          Economy: "경제",
-          Society: "사회",
-          LifestyleCulture: "생활/문화",
-          Entertainment: "연예",
-          ITScience: "IT/과학"
-        };
-        return map[code] || code;
-      }
-
-      function createBriefingCarousel(containerId, data) {
-        let currentIndex = 0;
-        const validData = data.filter(item => item && item.title && item.url);
-        const container = document.getElementById(containerId);
-
-        container.innerHTML = `
-  <div class="header-row">
-    <h2> 오늘의 핫토픽</h2>
-  </div>
-  <div class="carousel">
-    <button id="prevBtn" class="carousel-btn prev-btn">〈</button>
-    
-    <div class="card-wrapper">
-      <div class="card" id="cardContent"></div>
-    </div>
-    
-    <button id="nextBtn" class="carousel-btn next-btn">〉</button>
-  </div>
-  <div class="progress-indicator" id="progressIndicator"></div>
-`;
-
-        const card = container.querySelector("#cardContent");
-        const prevBtn = container.querySelector("#prevBtn");
-        const nextBtn = container.querySelector("#nextBtn");
-        const progress = container.querySelector("#progressIndicator");
-
-        function renderProgress() {
-          progress.innerHTML = '';
-          validData.forEach((_, i) => {
-            const dot = document.createElement('div');
-            dot.className = 'dot';
-            if (i === currentIndex) dot.classList.add('active');
-            progress.appendChild(dot);
-          });
-        }
-
-        function renderCard(index) {
-          const item = validData[index];
-          if (!item) {
-            card.innerHTML = `<p>유효하지 않은 뉴스입니다.</p>`;
-            return;
-          }
-
-          const { title, imageUrl, newsId } = item;
-          const image = imageUrl || 'assets/news1.png';
-
-          card.innerHTML = `
-          <img src="${image}" alt="뉴스 이미지"
-              style="width:100%; object-fit:cover; border-radius:10px;" />
-          <h3>${title}</h3>
+      newsList.forEach(news => {
+        const card = document.createElement('div');
+        card.className = 'news-card';
+        const imageUrl = news.imageUrl || 'assets/news1.png';
+        card.innerHTML = `
+          <img src="${imageUrl}" alt="뉴스 썸네일" class="news-thumbnail" />
+          <div class="news-text">
+            <div class="news-title">${news.title}</div>
+          </div>
         `;
-          card.onclick = async () => {
-            localStorage.setItem("selectedNewsId", newsId);
+        card.addEventListener("click", () => {
+          localStorage.setItem("selectedNewsId", news.newsId);
+          location.href = "CardDetail.html";
+        });
+        sectionGroup.appendChild(card);
+      });
 
-            const token = localStorage.getItem("token");
-            if (token) {
-              await fetch(`http://localhost:8080/api/news/click/${newsId}`, {
-                method: "POST",
-                headers: {
-                  "Authorization": `Bearer ${token}`
-                }
-              });
-            }
+      newsContainer.appendChild(sectionGroup);
+    }
 
-            location.href = "CardDetail.html";
-          };
-
-          renderProgress();
-        }
-
-        prevBtn.onclick = () => {
-          if (currentIndex > 0) {
-            currentIndex--;
-            renderCard(currentIndex);
-          }
-        };
-
-        nextBtn.onclick = () => {
-          if (currentIndex < validData.length - 1) {
-            currentIndex++;
-            renderCard(currentIndex);
-          }
-        };
-
-        if (validData.length > 0) {
-          renderCard(currentIndex);
-        } else {
-          card.innerHTML = `<p>표시할 뉴스가 없습니다.</p>`;
-        }
+    function handleCategoryFromHeader() {
+      const selected = localStorage.getItem("selectedCategory");
+      if (selected) {
+        document.getElementById("briefingContainer").style.display = "none";
+        fetch(`http://localhost:8080/api/news/card?category=${selected}`)
+          .then(res => res.json())
+          .then(data => {
+            newsTitles = data;
+            renderNews(newsTitles);
+            localStorage.removeItem("selectedCategory");
+          })
+          .catch(err => console.error('선택 카테고리 뉴스 로딩 실패:', err));
       }
-    });
+    }
+
+    async function buildCategoryOptions() {
+      const storedUserId = localStorage.getItem('userId');
+      let categories = JSON.parse(localStorage.getItem('interestCategories') || '[]');
+
+      if (categories.length === 0 && storedUserId) {
+        categories = await fetchUserCategories(storedUserId);
+        localStorage.setItem('interestCategories', JSON.stringify(categories));
+      }
+
+      categorySelect.innerHTML = '';
+      const allOption = new Option('모든 뉴스', 'ALL');
+      allOption.selected = true;
+      categorySelect.appendChild(allOption);
+
+      categorySelect.appendChild(new Option('내 관심 카테고리', 'MY'));
+    }
+
+    async function fetchUserCategories(userId) {
+      try {
+        const res = await fetch(`http://localhost:8080/api/signup/preferences/${userId}`);
+        return await res.json();
+      } catch (err) {
+        console.error("카테고리 불러오기 실패", err);
+        return [];
+      }
+    }
+
+    function translateCategory(code) {
+      const map = {
+        Politics: "정치",
+        Economy: "경제",
+        Society: "사회",
+        LifestyleCulture: "생활/문화",
+        Entertainment: "연예",
+        ITScience: "IT/과학"
+      };
+      return map[code] || code;
+    }
+
+    function createBriefingCarousel(containerId, data) {
+      let currentIndex = 0;
+      const validData = data.filter(item => item && item.title && item.url);
+      const container = document.getElementById(containerId);
+
+      container.innerHTML = `
+      <div class="header-row">
+        <h2> 오늘의 핫토픽</h2>
+      </div>
+      <div class="carousel">
+        <button id="prevBtn" class="carousel-btn prev-btn">‹</button>
+        <div class="card-wrapper">
+          <div class="card" id="cardContent"></div>
+        </div>
+        <button id="nextBtn" class="carousel-btn next-btn">›</button>
+      </div>
+      <div class="progress-indicator" id="progressIndicator"></div>
+    `;
+
+      const card = container.querySelector("#cardContent");
+      const prevBtn = container.querySelector("#prevBtn");
+      const nextBtn = container.querySelector("#nextBtn");
+      const progress = container.querySelector("#progressIndicator");
+
+      function renderProgress() {
+        progress.innerHTML = '';
+        validData.forEach((_, i) => {
+          const dot = document.createElement('div');
+          dot.className = 'dot';
+          if (i === currentIndex) dot.classList.add('active');
+          progress.appendChild(dot);
+        });
+      }
+
+      function renderCard(index) {
+        const item = validData[index];
+        if (!item) {
+          card.innerHTML = `<p>유효하지 않은 뉴스입니다.</p>`;
+          return;
+        }
+
+        const { title, imageUrl, newsId } = item;
+        const image = imageUrl || 'assets/news1.png';
+
+        card.innerHTML = `
+        <img src="${image}" alt="뉴스 이미지"
+            style="width:100%; object-fit:cover; border-radius:10px;" />
+        <h3>${title}</h3>
+      `;
+        card.onclick = async () => {
+          localStorage.setItem("selectedNewsId", newsId);
+
+          const token = localStorage.getItem("token");
+          if (token) {
+            await fetch(`http://localhost:8080/api/news/click/${newsId}`, {
+              method: "POST",
+              headers: {
+                "Authorization": `Bearer ${token}`
+              }
+            });
+          }
+
+          location.href = "CardDetail.html";
+        };
+
+        renderProgress();
+      }
+
+      prevBtn.onclick = () => {
+        if (currentIndex > 0) {
+          currentIndex--;
+          renderCard(currentIndex);
+        }
+      };
+
+      nextBtn.onclick = () => {
+        if (currentIndex < validData.length - 1) {
+          currentIndex++;
+          renderCard(currentIndex);
+        }
+      };
+
+      if (validData.length > 0) {
+        renderCard(currentIndex);
+      } else {
+        card.innerHTML = `<p>표시할 뉴스가 없습니다.</p>`;
+      }
+    }
+  });
   </script>
 </body>
 </html>
