@@ -83,24 +83,39 @@ document.addEventListener("DOMContentLoaded", async function () {
 
     // 스크랩 기능
     document.getElementById("scrapIcon").addEventListener("click", async () => {
-      if (!token) return alert("로그인 후 스크랩할 수 있습니다.");
+    if (!token) return alert("로그인 후 스크랩할 수 있습니다.");
 
-      try {
+    try {
+      if (isScrapped) {
+        // 이미 스크랩된 상태 → 스크랩 취소
+        const res = await fetch(`http://localhost:8080/api/scrap/${newsId}`, {
+          method: "DELETE",
+          headers: { "Authorization": `Bearer ${token}` }
+        });
+
+        if (res.ok) {
+          document.getElementById("scrapIcon").src = "assets/emptyscrap.png";
+          isScrapped = false;
+        } else {
+        }
+      } else {
+        // 스크랩 안 된 상태 → 스크랩 추가
         const res = await fetch(`http://localhost:8080/api/scrap/${newsId}`, {
           method: "POST",
           headers: { "Authorization": `Bearer ${token}` }
         });
 
         if (res.ok) {
-          alert("스크랩 완료!");
-          document.getElementById("scrapIcon").src = "assets/fillstar.png";
+          document.getElementById("scrapIcon").src = "assets/fillscrap.png";
+          isScrapped = true;
         } else {
-          alert("스크랩 실패");
         }
-      } catch (err) {
-        console.error("스크랩 실패:", err);
       }
-    });
+    } catch (err) {
+      console.error("스크랩 처리 실패:", err);
+    }
+  });
+
 
     // 드롭다운 변경 시 자동 변환
     document.getElementById("styleSelect").addEventListener("change", async (e) => {
