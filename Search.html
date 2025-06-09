@@ -13,7 +13,7 @@
     <!-- 검색 입력창 -->
     <div class="search-section">
       <div class="search-box">
-        <input type="text" id="keywordInput" placeholder="궁금한 지식과 뉴시커를 찾아보세요" />
+        <input type="text" id="keywordInput" placeholder="궁금한 뉴스를 검색해보세요" />
         <button id="searchBtn">🔍</button>
       </div>
     </div>
@@ -60,7 +60,7 @@
             if (loginBtn) loginBtn.style.display = "none";
             if (welcomeText) {
               welcomeText.style.display = "inline-block";
-              welcomeText.textContent = `${user.userId}님 반가워요!`;
+              welcomeText.textContent = `${user.userId}님`;
               welcomeText.style.fontWeight = "bold";
             }
           } else {

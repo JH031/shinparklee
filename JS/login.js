@@ -26,7 +26,6 @@ document.getElementById("loginForm").addEventListener("submit", function(e) {
   localStorage.setItem('isLoggedIn', 'true');
   localStorage.setItem('userId', userId);
 
-  alert("✅ 로그인 성공!");
   window.location.href = "Home.html";
 })
 .catch(err => {
