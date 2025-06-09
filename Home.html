@@ -5,6 +5,7 @@
   <title>NEWSCENES - Home</title>
   <link rel="stylesheet" href="CSS/home.css" />
   <link rel="stylesheet" href="CSS/Header.css" />
+  <link rel="stylesheet" href="CSS/Footer.css" />
 </head>
 <body>
    <div id="header-container"></div>
@@ -22,9 +23,12 @@
 
     <div class="news-container" id="newsContainer"></div>
   </div>
+  <div id="footer-container"></div>
+
 
   <script type="module">
    document.addEventListener('DOMContentLoaded', async function () {
+
     const searchInput = document.querySelector('.search-box input');
     const searchBtn = document.querySelector('.search-box button');
     const categorySelect = document.getElementById('categorySelect');
@@ -35,6 +39,11 @@
     const headerRes = await fetch("components/Header.html");
     const headerHTML = await headerRes.text();
     document.getElementById("header-container").innerHTML = headerHTML;
+
+    // ✅ Footer 삽입
+    const footerRes = await fetch("components/Footer.html");
+    const footerHTML = await footerRes.text();
+    document.getElementById("footer-container").innerHTML = footerHTML;
 
     // ✅ 삽입 후 요소 참조
     const loginBtn = document.getElementById("loginBtn");
@@ -381,4 +390,5 @@
   });
   </script>
 </body>
+
 </html>

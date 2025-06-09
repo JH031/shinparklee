@@ -1,0 +1,28 @@
+.footer {
+  background-color: #2d3436;  /* 어두운 톤으로 변경 */
+  color: #f1f1f1;
+  padding: 16px 20px;
+  font-size: 13px;
+  width: 100%;
+  box-sizing: border-box;
+}
+
+.footer-simple-line {
+  max-width: 1200px;
+  margin: 0 auto;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 20px;
+  justify-content: space-between;
+  align-items: center;
+  text-align: center;
+}
+
+.footer-simple-line span {
+  white-space: nowrap;
+}
+
+.footer-simple-line a {
+  color: #f1f1f1;
+  text-decoration: underline;
+}

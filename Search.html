@@ -5,6 +5,7 @@
   <title>검색</title>
   <link rel="stylesheet" href="CSS/search.css" />
   <link rel="stylesheet" href="CSS/Header.css" />
+  <link rel="stylesheet" href="CSS/Footer.css" />
 </head>
 <body>
   <div id="header-container"></div>
@@ -29,6 +30,7 @@
     <!-- 검색 결과 -->
     <div id="searchResults" class="results-container"></div>
   </div>
+  <div id="footer-container"></div>
 
   <script type="module">
     document.addEventListener("DOMContentLoaded", async () => {
@@ -36,6 +38,11 @@
       const headerRes = await fetch("components/Header.html");
       const headerHTML = await headerRes.text();
       document.getElementById("header-container").innerHTML = headerHTML;
+
+      // ✅ Footer 삽입
+      const footerRes = await fetch("components/Footer.html");
+      const footerHTML = await footerRes.text();
+      document.getElementById("footer-container").innerHTML = footerHTML;
 
       // ✅ 로그인 상태 처리
       const loginBtn = document.getElementById("loginBtn");
@@ -108,34 +115,31 @@
       });
 
       function loadRecentSearches() {
-  const recent = JSON.parse(localStorage.getItem("recentSearches") || "[]");
-  recentList.innerHTML = "";
+        const recent = JSON.parse(localStorage.getItem("recentSearches") || "[]");
+        recentList.innerHTML = "";
 
-  recent.forEach(keyword => {
-    const tag = document.createElement("div");
-    tag.className = "keyword-tag";
-    tag.innerHTML = `
-      <span>${keyword}</span>
-      <button class="remove-btn" title="삭제">×</button>
-    `;
+        recent.forEach(keyword => {
+          const tag = document.createElement("div");
+          tag.className = "keyword-tag";
+          tag.innerHTML = `
+            <span>${keyword}</span>
+            <button class="remove-btn" title="삭제">×</button>
+          `;
 
-    // ✅ 키워드 클릭 시 검색 실행
-    tag.querySelector("span").addEventListener("click", () => {
-      input.value = keyword;
-      search();
-    });
+          tag.querySelector("span").addEventListener("click", () => {
+            input.value = keyword;
+            search();
+          });
 
-    // ✅ [삭제 버튼] 클릭 시 해당 키워드 삭제
-    tag.querySelector("button").addEventListener("click", () => {
-      const updated = recent.filter(k => k !== keyword); // 제외한 배열 새로 생성
-      localStorage.setItem("recentSearches", JSON.stringify(updated)); // 업데이트
-      loadRecentSearches(); // 다시 렌더링
-    });
+          tag.querySelector("button").addEventListener("click", () => {
+            const updated = recent.filter(k => k !== keyword);
+            localStorage.setItem("recentSearches", JSON.stringify(updated));
+            loadRecentSearches();
+          });
 
-    recentList.appendChild(tag);
-  });
-}
-
+          recentList.appendChild(tag);
+        });
+      }
 
       async function search() {
         const keyword = input.value.trim();
