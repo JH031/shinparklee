@@ -1,0 +1,37 @@
+package spl.demo.controller;
+
+import io.swagger.v3.oas.annotations.Operation;
+import lombok.RequiredArgsConstructor;
+import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.web.bind.annotation.*;
+import spl.demo.dto.UserInfoDto;
+import spl.demo.dto.UserUpdateRequestDto;
+import spl.demo.security.CustomUserDetails;
+import spl.demo.service.UserService;
+
+@RestController
+@RequestMapping("/api/users") //회원관련 api 기본 경로
+@RequiredArgsConstructor
+public class UserController {
+
+    private final UserService userService;
+
+    @Operation(summary = "로그인한 회원 정보 조회")
+    @GetMapping("/me")
+    public ResponseEntity<UserInfoDto> getMyInfo(@AuthenticationPrincipal CustomUserDetails userDetails) {
+        String userId = userDetails.getUsername(); // == user.getUserId()
+        return ResponseEntity.ok(userService.getUserInfoByUserId(userId));
+    }
+
+    @PutMapping("/me")
+    @Operation(summary = "유저 정보 수정")
+    public ResponseEntity<String> updateUserInfo(
+            @AuthenticationPrincipal CustomUserDetails userDetails,
+            @RequestBody UserUpdateRequestDto dto
+    ) {
+        userService.updateUserInfo(userDetails.getUsername(), dto); // 또는 getUserId() 사용
+        return ResponseEntity.ok("회원 정보가 수정되었습니다.");
+    }
+
+}
